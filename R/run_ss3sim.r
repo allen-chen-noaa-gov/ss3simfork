@@ -196,7 +196,8 @@ run_ss3sim <- function(iterations, scenarios, case_folder,
       mlacomp_params    = a$mlacomp,
       em_binning_params = a$em_binning,
       retro_params      = a$retro,
-      estim_params      = a$E)
+      estim_params      = a$E,
+	  functionname		= a$econ)
   })
 
   # Note that inside a foreach loop you pop out of your current
@@ -224,14 +225,14 @@ run_ss3sim <- function(iterations, scenarios, case_folder,
         }
 
         message("Running iterations in parallel.")
-        foreach::foreach(it_ = iterations, .packages = "ss3sim",
+        foreach::foreach(it_ = iterations, .packages = "ss3simfork",
           .verbose = TRUE, .export = "substr_r") %dopar%
             do.call("ss3sim_base",  c(x, list(iterations = it_,
               bias_already_run = TRUE), dots))
       })
     } else {
       message("Running scenarios in parallel.")
-      foreach::foreach(x = arg_list, .packages = "ss3sim",
+      foreach::foreach(x = arg_list, .packages = "ss3simfork",
         .verbose = FALSE, .export = "substr_r") %dopar%
           do.call("ss3sim_base", c(x, list(iterations = iterations, ...)))
     }

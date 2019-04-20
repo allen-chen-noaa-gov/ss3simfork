@@ -180,7 +180,7 @@ ss3sim_base <- function(iterations, scenarios, f_params,
   user_recdevs = NULL, user_recdevs_warn = TRUE, bias_adjust = FALSE,
   bias_nsim = 5, bias_already_run = FALSE, hess_always = FALSE,
   print_logfile = TRUE, sleep = 0, conv_crit = 0.2, seed = 21,
-  keep_compreport = TRUE, ...) {
+  keep_compreport = TRUE, functionname = NULL, ...) {
 
   # In case ss3sim_base is stopped before finishing:
   old_wd <- getwd()
@@ -294,6 +294,8 @@ ss3sim_base <- function(iterations, scenarios, f_params,
       datfile.orig <- SS_readdat(pastef(sc, i, "om", "ss3.dat"),
                                  verbose = FALSE)
       datfile.orig <- change_fltname(datfile.orig)
+
+	  datfile.origsave <- datfile.orig
 
       if (call_change_data) {
         # Start by clearing out the old data. Important so that extra data
@@ -469,6 +471,16 @@ ss3sim_base <- function(iterations, scenarios, f_params,
               write_file       = FALSE)
       }
 
+############################################################################################################
+############################################################################################################
+############################################################################################################
+functionname2 <- get(functionname[[1]])
+dat_list2 <- dat_list
+dat_list <- sample_econ(functionname2,datfile.origsave,dat_list2)
+############################################################################################################
+############################################################################################################
+############################################################################################################
+	  
       # Manipulate EM control file to adjust what gets estimated
       # We'll only a portion of the function, the ctl part if
       # it's a bias run or if bias adjustment isn't getting run.
@@ -502,7 +514,7 @@ ss3sim_base <- function(iterations, scenarios, f_params,
                   run_change_e_full    = run_change_e_full))
         setwd(wd)
       }
-
+	  
       SS_writedat(datlist = dat_list, outfile = pastef(sc, i, "em", "ss3.dat"),
         overwrite = TRUE, verbose = FALSE)
 
