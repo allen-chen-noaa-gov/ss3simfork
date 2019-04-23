@@ -1,11 +1,12 @@
 moredata <- function(datfile.origsave,dat_list){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
-						fleets          = 3,
+						fleets          = 2,
 						years           = list(74:100),
-						sds_obs         = list(0.1),
+						sds_obs         = list(0.2),
 						write_file      = FALSE)
 		
+dattemp$CPUE$index <- 3
 newabund <- dattemp$CPUE
 
 dat_list$CPUE <- rbind(dat_list$CPUE, newabund)

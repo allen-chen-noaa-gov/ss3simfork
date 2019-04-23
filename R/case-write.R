@@ -214,6 +214,49 @@ case_fishing <- function(years = 1, years_alter = NULL, fvals = 2, case, spp) {
   }
 }
 
+#put in case-write.R write E case
+case_E <- function(natM_type = NULL, natM_n_breakpoints = NULL, natM_lorenzen = NULL, natM_val = NULL,
+  par_name = NULL, par_int = NULL, par_phase = NULL, forecast_num = NULL, case, spp) {
+
+  old <- options()$"deparse.cutoff"
+  options(deparse.cutoff = 500L)
+  on.exit(options(deparse.cutoff = old))
+
+  for (ind in seq_along(spp)){
+    filename <- paste0("E", case, "-", spp[ind], ".txt")
+    mapply(write, file = filename, MoreArgs = list(ncolumns = 2,
+      x = c("natM_type;", natM_type)))
+    mapply(write, file = filename, MoreArgs = list(ncolumns = 2, append = TRUE,
+      x = c("natM_n_breakpoints;", case_deparse(natM_n_breakpoints))))
+    mapply(write, file = filename, MoreArgs = list(ncolumns = 2, append = TRUE,
+      x = c("natM_lorenzen;", case_deparse(natM_lorenzen))))
+    mapply(write, file = filename, MoreArgs = list(ncolumns = 2, append = TRUE,
+      x = c("natM_val;", case_deparse(natM_val))))
+	mapply(write, file = filename, MoreArgs = list(ncolumns = 2, append = TRUE,
+      x = c("par_name;", par_name)))
+	mapply(write, file = filename, MoreArgs = list(ncolumns = 2, append = TRUE,
+      x = c("par_int;", case_deparse(par_int))))
+	mapply(write, file = filename, MoreArgs = list(ncolumns = 2, append = TRUE,
+      x = c("par_phase;", case_deparse(par_phase))))
+	mapply(write, file = filename, MoreArgs = list(ncolumns = 2, append = TRUE,
+      x = c("forecast_num;", case_deparse(forecast_num))))
+  }
+}
+
+#put in case-write.R write econ case
+case_econ <- function(functionname = NULL, case, spp) {
+
+  old <- options()$"deparse.cutoff"
+  options(deparse.cutoff = 500L)
+  on.exit(options(deparse.cutoff = old))
+
+  for (ind in seq_along(spp)){
+    filename <- paste0("econ", case, "-", spp[ind], ".txt")
+    mapply(write, file = filename, MoreArgs = list(ncolumns = 2,
+      x = c("functionname;", functionname)))
+  }
+}
+
 #' Turn an argument describing an object into a character.
 #' @details Includes checks to make sure multiple lines will not be created.
 #' @param x The argument you would like to \code{deparse}.

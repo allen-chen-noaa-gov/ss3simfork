@@ -1,4 +1,4 @@
-moredatadahl <- function(datfile.origsave,dat_list){
+moredatabias <- function(datfile.origsave,dat_list){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
 						fleets          = 2,
@@ -131,11 +131,13 @@ methodname = "BFGS"
 
 func <- logit_correction_v
 otherdatfin$distance <- as.matrix(distancefin)
-# print(Sys.time())
-results_savev <- discretefish_subroutine(catchfin,choicefin,distancefin,otherdatfin,initparams,optimOpt,func,methodname)
-# print(Sys.time())
 
-newabund[i] <- sum(results_savev$OutLogit[2:5,1])*scaleq
+XX <- model.matrix(~as.factor(V1)-1, choicefin)*sifin
+YY <- catchfin$V1
+
+results_savev <- lm(YY~XX-1)
+
+newabund[i] <- sum(results_savev$coef)*scaleq
 }
 
 dattemp$CPUE$obs <- unlist(newabund)
@@ -146,13 +148,13 @@ abundout$index.x <- NULL
 abundout$se_log.x <- NULL
 abundout$index.y <- NULL
 names(abundout)[names(abundout) == "obs.x"] <- "TrueCPUE"
-names(abundout)[names(abundout) == "obs.y"] <- "DahlCPUE"
+names(abundout)[names(abundout) == "obs.y"] <- "BiasCPUE"
 
-abundout$diffperc = (abundout$TrueCPUE - abundout$DahlCPUE)/abundout$TrueCPUE
+abundout$diffperc = (abundout$TrueCPUE - abundout$BiasCPUE)/abundout$TrueCPUE
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 write.table(abundout, 
-file=paste0("J:\\AHaynie\\Fish Size 2014\\catch_expectations\\abund_indices\\abund-",gsub("/", "-", abundtitle),".csv"), 
+file=paste0("J:\\AHaynie\\Fish Size 2014\\catch_expectations\\abund_indices\\biasabund-",gsub("/", "-", abundtitle),".csv"), 
 sep=",", row.names=FALSE, quote = FALSE)
 
 dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))
