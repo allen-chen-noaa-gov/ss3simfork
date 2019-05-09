@@ -12,7 +12,7 @@ ss3sim_base(iterations, scenarios, f_params, index_params, lcomp_params,
   user_recdevs = NULL, user_recdevs_warn = TRUE, bias_adjust = FALSE,
   bias_nsim = 5, bias_already_run = FALSE, hess_always = FALSE,
   print_logfile = TRUE, sleep = 0, conv_crit = 0.2, seed = 21,
-  keep_compreport = TRUE, ...)
+  keep_compreport = TRUE, functionname = NULL, ...)
 }
 \arguments{
 \item{iterations}{Which iterations to run. A numeric vector.}

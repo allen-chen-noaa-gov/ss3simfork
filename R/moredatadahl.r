@@ -1,3 +1,11 @@
+#' moredata
+#'
+#'
+#' @param datfile.origsave description
+#' @param dat_list description
+#'
+#' @export
+
 moredatadahl <- function(datfile.origsave,dat_list){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
@@ -155,7 +163,8 @@ write.table(abundout,
 file=paste0("J:\\AHaynie\\Fish Size 2014\\catch_expectations\\abund_indices\\abund-",gsub("/", "-", abundtitle),".csv"), 
 sep=",", row.names=FALSE, quote = FALSE)
 
-dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))
+# dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))
+dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/mean(dattemp$CPUE$obs))^2)))
 
 dat_list$CPUE <- rbind(dat_list$CPUE, dattemp$CPUE)
 

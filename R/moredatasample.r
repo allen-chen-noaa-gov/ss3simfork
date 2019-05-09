@@ -6,7 +6,7 @@
 #'
 #' @export
 
-moredatabias <- function(datfile.origsave,dat_list){
+moredatasample <- function(datfile.origsave,dat_list){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
 						fleets          = 2,
@@ -93,7 +93,9 @@ Vijk[[k]] <- alpha*yik[[k]] + tijk
 
 }
 
-choice[[j]] <- as.matrix(which(t(apply(matrix(unlist(Vijk),ii[j],kk),1,max)==matrix(unlist(Vijk),ii[j],kk)))-(((1:ii[j])-1)*kk))
+# choice[[j]] <- as.matrix(which(t(apply(matrix(unlist(Vijk),ii[j],kk),1,max)==matrix(unlist(Vijk),ii[j],kk)))-(((1:ii[j])-1)*kk))
+choice[[j]] <- matrix(as.numeric(sample(1:kk,ii[k]*1,replace=TRUE),ii[k],1))
+
 yikchosen[[j]] <- as.matrix(diag(matrix(unlist(yik),ii[j],kk)[,choice[[j]]]))
 
 siout[[j]] <- si[[j]]
@@ -162,7 +164,7 @@ abundout$diffperc = (abundout$TrueCPUE - abundout$BiasCPUE)/abundout$TrueCPUE
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 write.table(abundout, 
-file=paste0("J:\\AHaynie\\Fish Size 2014\\catch_expectations\\abund_indices\\biasabund-",gsub("/", "-", abundtitle),".csv"), 
+file=paste0("J:\\AHaynie\\Fish Size 2014\\catch_expectations\\abund_indices\\sampleabund-",gsub("/", "-", abundtitle),".csv"), 
 sep=",", row.names=FALSE, quote = FALSE)
 
 # dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))

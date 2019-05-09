@@ -6,7 +6,7 @@
 #'
 #' @export
 
-moredatadahlread <- function(datfile.origsave,dat_list){
+moredatadahlreadrel <- function(datfile.origsave,dat_list){
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 dahldirout <- "C:/Users/allen.chen/Work/SS3SIM/dahldat/"
@@ -16,7 +16,10 @@ abundtitle3 <- gsub(".*-", "", abundtitle2)
 
 dattemp <- read.csv(paste(dahldirout,"dahl-D33-E33-F0-M0-cod-",abundtitle3,".csv",sep=""))
 
-dattemp$se_log <- sqrt(log(1+((sd(dattemp$obs)/mean(dattemp$obs))^2)))
+dattemp$obs <- dattemp$obs/1000
+
+# dattemp$se_log <- sqrt(log(1+((sd(dattemp$obs)/mean(dattemp$obs))^2)))
+dattemp$se_log <- 0.2
 
 dat_list$CPUE <- rbind(dat_list$CPUE, dattemp)
 

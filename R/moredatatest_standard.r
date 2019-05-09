@@ -1,4 +1,4 @@
-#' moredata
+#' moredatatest
 #'
 #'
 #' @param datfile.origsave description
@@ -6,18 +6,19 @@
 #'
 #' @export
 
-moredata <- function(datfile.origsave,dat_list){
+moredatatest_standard <- function(datfile.origsave,dat_list){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
-						fleets          = 2,
+						fleets          = 3,
 						years           = list(74:100),
 						sds_obs         = list(0.2),
 						write_file      = FALSE)
 		
-dattemp$CPUE$index <- 3
 newabund <- dattemp$CPUE
+newabund$obs <- 1
+newabund$se_log <- 0.2
 
-newabund$se_log <- sqrt(log(1+((sd(newabund$obs)/mean(newabund$obs))^2)))
+dat_list$CPUE$obs <- dat_list$CPUE$obs/mean(dat_list$CPUE$obs) 
 
 dat_list$CPUE <- rbind(dat_list$CPUE, newabund)
 
