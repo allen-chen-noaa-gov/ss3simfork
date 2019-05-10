@@ -9,12 +9,14 @@
 moredatadahlreadrel <- function(datfile.origsave,dat_list){
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
-dahldirout <- "C:/Users/allen.chen/Work/SS3SIM/dahldat/"
+dahldirout <- "C:/Users/allen.chen/SS3SIM_SCRATCH/dahldat/"
 
 abundtitle2 <- gsub("/", "-", abundtitle)
 abundtitle3 <- gsub(".*-", "", abundtitle2)
 
-dattemp <- read.csv(paste(dahldirout,"dahl-D33-E33-F0-M0-cod-",abundtitle3,".csv",sep=""))
+dattemp <- read.csv(paste(dahldirout,"dahl-D225-E39-F2-M0-cod-",abundtitle3,".csv",sep=""))
+
+dattemp$sumcatches <- NULL
 
 dattemp$obs <- dattemp$obs/1000
 

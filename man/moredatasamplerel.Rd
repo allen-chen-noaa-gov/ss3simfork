@@ -2,7 +2,7 @@
 % Please edit documentation in R/moredatasamplerel.r
 \name{moredatasamplerel}
 \alias{moredatasamplerel}
-\title{moredata}
+\title{moredatasamplerel}
 \usage{
 moredatasamplerel(datfile.origsave, dat_list)
 }
@@ -12,5 +12,5 @@ moredatasamplerel(datfile.origsave, dat_list)
 \item{dat_list}{description}
 }
 \description{
-moredata
+moredatasamplerel
 }

@@ -1,4 +1,4 @@
-#' moredata
+#' moredatabiasrel
 #'
 #'
 #' @param datfile.origsave description

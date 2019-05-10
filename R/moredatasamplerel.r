@@ -1,4 +1,4 @@
-#' moredata
+#' moredatasamplerel
 #'
 #'
 #' @param datfile.origsave description
@@ -164,7 +164,7 @@ abundout$diffperc = (abundout$TrueCPUE - abundout$BiasCPUE)/abundout$TrueCPUE
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 write.table(abundout, 
-file=paste0("J:\\AHaynie\\Fish Size 2014\\catch_expectations\\abund_indices\\sampleabund-",gsub("/", "-", abundtitle),".csv"), 
+file=paste0("C:\\Users\\allen.chen\\SS3SIM_SCRATCH\\abund_indices\\sampleabund-",gsub("/", "-", abundtitle),".csv"), 
 sep=",", row.names=FALSE, quote = FALSE)
 
 # dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))

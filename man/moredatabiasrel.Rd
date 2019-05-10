@@ -2,7 +2,7 @@
 % Please edit documentation in R/moredatabiasrel.r
 \name{moredatabiasrel}
 \alias{moredatabiasrel}
-\title{moredata}
+\title{moredatabiasrel}
 \usage{
 moredatabiasrel(datfile.origsave, dat_list)
 }
@@ -12,5 +12,5 @@ moredatabiasrel(datfile.origsave, dat_list)
 \item{dat_list}{description}
 }
 \description{
-moredata
+moredatabiasrel
 }
