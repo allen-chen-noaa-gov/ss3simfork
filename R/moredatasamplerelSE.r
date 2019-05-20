@@ -1,4 +1,4 @@
-#' moredatabiasrel
+#' moredatasamplerelSE
 #'
 #'
 #' @param datfile.origsave description
@@ -6,7 +6,7 @@
 #'
 #' @export
 
-moredatabiasrel <- function(datfile.origsave,dat_list){
+moredatasamplerelSE <- function(datfile.origsave,dat_list){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
 						fleets          = 2,
@@ -27,7 +27,6 @@ scalecatch <- realcpue$obs/mean(realcpue$obs)
 ####################################################################################################
 
 newabund <- list()
-sumcatches <- list()
 for (i in 1:length(scalecatch)) { 
 
 library(barebones.FishSET)
@@ -56,10 +55,8 @@ zi[[l]] <- matrix(sample(1:10,ii[l]*1,replace=TRUE),ii[l],1)
 }
 
 bik <- list()	
-bikreal <- list()	
 for (l in 1:kk) { #can vectorize?
 bik[[l]] <- matrix(rnorm(ii[l]*kk,0,3),ii[l],kk)
-bikreal[[l]] <- matrix(rnorm(ii[l]*kk,0,1),ii[l],kk)
 }
 
 wijk <- list()
@@ -70,7 +67,6 @@ wijk[[l]] <- matrix((-log(rexp(ii[l]*kk,1))),ii[l],kk)
 
 choice <- list()
 yikchosen <- list()
-yikreal <- list()
 siout <- list()
 siout2 <- list()
 ziout <- list()
@@ -92,15 +88,15 @@ tijk <- betac*distance[j,k]*zi[[j]] + wijk[[j]][,k]
 ###################################Here for catch error
 yik[[k]] <- betavar[k,]*si[[j]] + bik[[j]][,k]
 
-yikreal[[k]] <- betavar[k,]*si[[j]] + bik[[j]][,k] + bikreal[[j]][,k]
-
 ###################################Here for multiple params
 Vijk[[k]] <- alpha*yik[[k]] + tijk
 
 }
 
-choice[[j]] <- as.matrix(which(t(apply(matrix(unlist(Vijk),ii[j],kk),1,max)==matrix(unlist(Vijk),ii[j],kk)))-(((1:ii[j])-1)*kk))
-yikchosen[[j]] <- as.matrix(diag(matrix(unlist(yikreal),ii[j],kk)[,choice[[j]]]))
+# choice[[j]] <- as.matrix(which(t(apply(matrix(unlist(Vijk),ii[j],kk),1,max)==matrix(unlist(Vijk),ii[j],kk)))-(((1:ii[j])-1)*kk))
+choice[[j]] <- matrix(as.numeric(sample(1:kk,ii[k]*1,replace=TRUE),ii[k],1))
+
+yikchosen[[j]] <- as.matrix(diag(matrix(unlist(yik),ii[j],kk)[,choice[[j]]]))
 
 siout[[j]] <- si[[j]]
 ziout[[j]] <- zi[[j]]
@@ -151,19 +147,13 @@ YY <- catchfin$V1
 
 results_savev <- lm(YY~XX-1)
 
-# results_savev$catches = cbind(sifin,catchfin)
-
-newabund[i] <- sum(results_savev$coef)*1000000 #was scaleq
-sumcatches[i] <- sum(catchfin)
+newabund[i] <- sum(results_savev$coef)*1000000
 }
 
 dattemp$CPUE$obs <- unlist(newabund)
 dattemp$CPUE$index <- 3
 
 abundout <- merge(realcpue, dattemp$CPUE,  by = c("year", "seas"))
-
-abundout <- abundout[order(abundout$year),]
-
 abundout$index.x <- NULL
 abundout$se_log.x <- NULL
 abundout$index.y <- NULL
@@ -172,16 +162,14 @@ names(abundout)[names(abundout) == "obs.y"] <- "BiasCPUE"
 
 abundout$diffperc = (abundout$TrueCPUE - abundout$BiasCPUE)/abundout$TrueCPUE
 
-abundout$sumcatches <- unlist(sumcatches)
-
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 write.table(abundout, 
-file=paste0("C:\\Users\\allen.chen\\SS3SIM_SCRATCH\\abund_indices\\flat_makebias\\biasabund-",gsub("/", "-", abundtitle),".csv"), 
+file=paste0("C:\\Users\\allen.chen\\SS3SIM_SCRATCH\\abund_indices\\sampleabund-",gsub("/", "-", abundtitle),".csv"), 
 sep=",", row.names=FALSE, quote = FALSE)
 
 # dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))
-# dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/mean(dattemp$CPUE$obs))^2)))
-dattemp$CPUE$se_log <- 0.2
+dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/mean(dattemp$CPUE$obs))^2)))
+# dattemp$CPUE$se_log <- 0.2
 
 dat_list$CPUE <- rbind(dat_list$CPUE, dattemp$CPUE)
 
