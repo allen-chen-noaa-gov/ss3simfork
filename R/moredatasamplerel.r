@@ -16,7 +16,7 @@ dattemp <- sample_index(dat_list        = datfile.origsave,
 						
 realcpue <- (datfile.origsave$CPUE[74:100,])
 
-scaleq <- mean(realcpue$obs)/4.5
+scaleq <- mean(realcpue$obs)/6.75
 		
 scalecatch <- realcpue$obs/mean(realcpue$obs)
 
@@ -30,22 +30,47 @@ newabund <- list()
 for (i in 1:length(scalecatch)) { 
 
 library(barebones.FishSET)
+library(MASS)
 
-kk <- 4
-ii <- rep(500, kk)
+kk <- 6
+# ii <- rep(500, kk)
+ii <- as.numeric(table(sample(1:kk,2000,replace=TRUE)))
 
 alpha <- 3
 betac <- -(1)
 
-betavar <- as.matrix(c(1.50, 1.25, 1.00, 0.75))*scalecatch[i]
-
-##########CATCH DIST HERE##########
-distance <- rbind(t(as.matrix(c(0.0, 0.5, 0.5, 0.707))), 
-			t(as.matrix(c(0.5, 0.0, 0.707, 0.5))), 
-			t(as.matrix(c(0.5, 0.707, 0, 0.5))), 
-			t(as.matrix(c(0.707, 0.5, 0.5, 0))))
+# betavar <- as.matrix(c(1.50, 1.25, 1.00, 0.75))*scalecatch[i]
+			
+distance = matrix(scan("C:/Users/Allen/Dropbox/Allen/Work/NMFS/packages_docs/testcodefor_barebones.FishSET/dahlMCs/sixdistances.csv", sep=",",quiet=TRUE),kk,kk)
 
 distance <- distance*3
+
+sigmaspace <- 1
+
+sspace <- 5
+
+covarspace <- (sigmaspace^2)*exp(-(distance/sspace)^2)
+
+checkzero <- 1
+
+while (checkzero>0 || is.na(checkzero)==TRUE){
+Xspace <- mvrnorm(1,mu=rep(0,kk),Sigma=covarspace)
+deltaspace <- mvrnorm(1,mu=rep(0,kk),Sigma=covarspace)
+
+betanotspace <- 2
+
+betaonespace <- runif(kk, -0.5, 0.5)
+
+# exp(betanotspace + betaonespace*Xspace)
+
+# saveabund[[i]] <- rpois(4,exp(betanotspace + betaonespace*Xspace))
+betavar <- rpois(kk,exp(betanotspace + betaonespace*Xspace + deltaspace))
+betavar <- betavar/(sum(betavar)/6.75)
+
+checkzero <- (min(betavar)<0.5)
+}
+
+betavar <- as.matrix(betavar)*scalecatch[i]
 
 si <- list()
 zi <- list()
@@ -55,8 +80,10 @@ zi[[l]] <- matrix(sample(1:10,ii[l]*1,replace=TRUE),ii[l],1)
 }
 
 bik <- list()	
+bikreal <- list()	
 for (l in 1:kk) { #can vectorize?
 bik[[l]] <- matrix(rnorm(ii[l]*kk,0,3),ii[l],kk)
+bikreal[[l]] <- matrix(rnorm(ii[l]*kk,0,1),ii[l],kk)
 }
 
 wijk <- list()
@@ -67,6 +94,7 @@ wijk[[l]] <- matrix((-log(rexp(ii[l]*kk,1))),ii[l],kk)
 
 choice <- list()
 yikchosen <- list()
+yikreal <- list()
 siout <- list()
 siout2 <- list()
 ziout <- list()
@@ -88,15 +116,16 @@ tijk <- betac*distance[j,k]*zi[[j]] + wijk[[j]][,k]
 ###################################Here for catch error
 yik[[k]] <- betavar[k,]*si[[j]] + bik[[j]][,k]
 
+yikreal[[k]] <- betavar[k,]*si[[j]] + bik[[j]][,k] + bikreal[[j]][,k]
+
 ###################################Here for multiple params
 Vijk[[k]] <- alpha*yik[[k]] + tijk
 
 }
 
 # choice[[j]] <- as.matrix(which(t(apply(matrix(unlist(Vijk),ii[j],kk),1,max)==matrix(unlist(Vijk),ii[j],kk)))-(((1:ii[j])-1)*kk))
-choice[[j]] <- matrix(as.numeric(sample(1:kk,ii[k]*1,replace=TRUE),ii[k],1))
-
-yikchosen[[j]] <- as.matrix(diag(matrix(unlist(yik),ii[j],kk)[,choice[[j]]]))
+choice[[j]] <- matrix(as.numeric(sample(1:kk,ii[j]*1,replace=TRUE),ii[j],1))
+yikchosen[[j]] <- as.matrix(diag(matrix(unlist(yikreal),ii[j],kk)[,choice[[j]]]))
 
 siout[[j]] <- si[[j]]
 ziout[[j]] <- zi[[j]]
@@ -164,7 +193,7 @@ abundout$diffperc = (abundout$TrueCPUE - abundout$BiasCPUE)/abundout$TrueCPUE
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 write.table(abundout, 
-file=paste0("C:\\Users\\allen.chen\\SS3SIM_SCRATCH\\abund_indices\\sampleabund-",gsub("/", "-", abundtitle),".csv"), 
+file=paste0("C:\\Users\\Allen\\Desktop\\abund_indices\\flatalpha6\\sampleabund-",gsub("/", "-", abundtitle),".csv"), 
 sep=",", row.names=FALSE, quote = FALSE)
 
 # dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))
