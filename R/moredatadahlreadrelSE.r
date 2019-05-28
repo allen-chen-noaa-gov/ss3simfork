@@ -1,4 +1,4 @@
-#' moredata
+#' moredatadahlreadrelSE
 #'
 #'
 #' @param datfile.origsave description
@@ -6,10 +6,10 @@
 #'
 #' @export
 
-moredatadahlreadrel <- function(datfile.origsave,dat_list){
+moredatadahlreadrelSE <- function(datfile.origsave,dat_list){
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
-dahldirout <- "C:/Users/Allen/Desktop/abund_indices/dahldat/flatalpha6/"
+dahldirout <- "C:/Users/allen.chen/SS3SIM_SCRATCH/dahldat/"
 
 abundtitle2 <- gsub("/", "-", abundtitle)
 abundtitle3 <- gsub(".*-", "", abundtitle2)
@@ -18,10 +18,10 @@ dattemp <- read.csv(paste(dahldirout,"dahl-D225-E39-F2-M0-cod-",abundtitle3,".cs
 
 dattemp$sumcatches <- NULL
 
-# dattemp$obs <- dattemp$obs/1000
+dattemp$obs <- dattemp$obs/1000
 
-# dattemp$se_log <- sqrt(log(1+((sd(dattemp$obs)/mean(dattemp$obs))^2)))
-dattemp$se_log <- 0.2
+dattemp$se_log <- sqrt(log(1+((sd(dattemp$obs)/mean(dattemp$obs))^2)))
+# dattemp$se_log <- 0.2
 
 dat_list$CPUE <- rbind(dat_list$CPUE, dattemp)
 

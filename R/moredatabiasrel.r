@@ -161,6 +161,9 @@ dattemp$CPUE$obs <- unlist(newabund)
 dattemp$CPUE$index <- 3
 
 abundout <- merge(realcpue, dattemp$CPUE,  by = c("year", "seas"))
+
+abundout <- abundout[order(abundout$year),]
+
 abundout$index.x <- NULL
 abundout$se_log.x <- NULL
 abundout$index.y <- NULL
@@ -173,7 +176,7 @@ abundout$sumcatches <- unlist(sumcatches)
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 write.table(abundout, 
-file=paste0("C:\\Users\\allen.chen\\SS3SIM_SCRATCH\\abund_indices\\biasabund-",gsub("/", "-", abundtitle),".csv"), 
+file=paste0("C:\\Users\\allen.chen\\SS3SIM_SCRATCH\\abund_indices\\flat_makebias\\biasabund-",gsub("/", "-", abundtitle),".csv"), 
 sep=",", row.names=FALSE, quote = FALSE)
 
 # dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))
