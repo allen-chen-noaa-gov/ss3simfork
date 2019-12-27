@@ -5,9 +5,16 @@
 \title{Change population and observed length composition bins in an SS estimation
 model}
 \usage{
-change_em_binning(dat_list, dat_file_out, bin_vector, lbin_method = NULL,
-  pop_binwidth = NULL, pop_minimum_size = NULL,
-  pop_maximum_size = NULL, write_file = TRUE)
+change_em_binning(
+  dat_list,
+  dat_file_out,
+  bin_vector,
+  lbin_method = NULL,
+  pop_binwidth = NULL,
+  pop_minimum_size = NULL,
+  pop_maximum_size = NULL,
+  write_file = TRUE
+)
 }
 \arguments{
 \item{dat_list}{An SS data list object as read in from
@@ -85,10 +92,13 @@ head(newdat$lencomp)
 newdat$agecomp
 }
 \seealso{
-Other change functions: \code{\link{change_data}},
-  \code{\link{change_e}}, \code{\link{change_f}},
-  \code{\link{change_maturity}},
-  \code{\link{change_retro}}, \code{\link{change_tv}}
+Other change functions: 
+\code{\link{change_data}()},
+\code{\link{change_e}()},
+\code{\link{change_f}()},
+\code{\link{change_maturity}()},
+\code{\link{change_retro}()},
+\code{\link{change_tv}()}
 }
 \author{
 Kotaro Ono (length-composition rebinning), Sean Anderson

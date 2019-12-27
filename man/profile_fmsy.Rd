@@ -4,8 +4,14 @@
 \alias{profile_fmsy}
 \title{Determine Fmsy for a given operating model}
 \usage{
-profile_fmsy(om_in, results_out, start = 0, end = 1.5, by_val = 0.01,
-  ss_mode = c("safe", "optimized"))
+profile_fmsy(
+  om_in,
+  results_out,
+  start = 0,
+  end = 1.5,
+  by_val = 0.01,
+  ss_mode = c("safe", "optimized")
+)
 }
 \arguments{
 \item{om_in}{A directory for an \pkg{ss3sim} operating model.}

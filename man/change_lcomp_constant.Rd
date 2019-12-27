@@ -4,8 +4,12 @@
 \alias{change_lcomp_constant}
 \title{Set the robustification constant for length composition data.}
 \usage{
-change_lcomp_constant(lcomp_constant, dat_list, dat_file_out,
-  write_file = TRUE)
+change_lcomp_constant(
+  lcomp_constant,
+  dat_list,
+  dat_file_out,
+  write_file = TRUE
+)
 }
 \arguments{
 \item{lcomp_constant}{*The new value to be used. Must be a numeric value, as

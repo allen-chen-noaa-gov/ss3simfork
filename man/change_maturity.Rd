@@ -4,8 +4,11 @@
 \alias{change_maturity}
 \title{Alter a control file to specify the SS3 maturity option}
 \usage{
-change_maturity(ctl_file_in = "em.ctl", ctl_file_out = "em.ctl",
-  maturity_option = 1L)
+change_maturity(
+  ctl_file_in = "em.ctl",
+  ctl_file_out = "em.ctl",
+  maturity_option = 1L
+)
 }
 \arguments{
 \item{ctl_file_in}{A string providing the path to the input SS3 \code{.ctl} file.}
@@ -53,10 +56,13 @@ unlink("test.ctl")
 setwd(wd)
 }
 \seealso{
-Other change functions: \code{\link{change_data}},
-  \code{\link{change_em_binning}}, \code{\link{change_e}},
-  \code{\link{change_f}}, \code{\link{change_retro}},
-  \code{\link{change_tv}}
+Other change functions: 
+\code{\link{change_data}()},
+\code{\link{change_em_binning}()},
+\code{\link{change_e}()},
+\code{\link{change_f}()},
+\code{\link{change_retro}()},
+\code{\link{change_tv}()}
 }
 \author{
 Sean C. Anderson

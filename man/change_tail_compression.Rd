@@ -4,8 +4,12 @@
 \alias{change_tail_compression}
 \title{Replace tail compression value for length composition data.}
 \usage{
-change_tail_compression(tail_compression, dat_list, dat_file_out,
-  write_file = TRUE)
+change_tail_compression(
+  tail_compression,
+  dat_list,
+  dat_file_out,
+  write_file = TRUE
+)
 }
 \arguments{
 \item{tail_compression}{*The new tail_compression value to be used. Must be a

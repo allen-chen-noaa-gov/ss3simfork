@@ -4,8 +4,7 @@
 \alias{change_rec_devs}
 \title{Replace recruitment deviations}
 \usage{
-change_rec_devs(recdevs_new, par_file_in = "ss3.par",
-  par_file_out = "ss3.par")
+change_rec_devs(recdevs_new, par_file_in = "ss3.par", par_file_out = "ss3.par")
 }
 \arguments{
 \item{recdevs_new}{A vector of new recruitment deviations.}

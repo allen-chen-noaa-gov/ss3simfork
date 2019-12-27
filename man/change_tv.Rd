@@ -4,11 +4,18 @@
 \alias{change_tv}
 \title{Methods to include time-varying parameters in an SS3 operating model}
 \usage{
-change_tv(change_tv_list, ctl_file_in = "control.ss_new",
-  ctl_file_out = "om.ctl", dat_file_in = "ss3.dat",
-  dat_file_out = "ss3.dat", par_file_in = "ss3.par",
-  par_file_out = "ss3.par", str_file_in = "starter.ss",
-  str_file_out = "starter.ss", rpt_file_in = "Report.sso")
+change_tv(
+  change_tv_list,
+  ctl_file_in = "control.ss_new",
+  ctl_file_out = "om.ctl",
+  dat_file_in = "ss3.dat",
+  dat_file_out = "ss3.dat",
+  par_file_in = "ss3.par",
+  par_file_out = "ss3.par",
+  str_file_in = "starter.ss",
+  str_file_out = "starter.ss",
+  rpt_file_in = "Report.sso"
+)
 }
 \arguments{
 \item{change_tv_list}{*A list of named vectors. Names correspond to parameters
@@ -134,10 +141,13 @@ setwd(wd)
 }
 }
 \seealso{
-Other change functions: \code{\link{change_data}},
-  \code{\link{change_em_binning}}, \code{\link{change_e}},
-  \code{\link{change_f}}, \code{\link{change_maturity}},
-  \code{\link{change_retro}}
+Other change functions: 
+\code{\link{change_data}()},
+\code{\link{change_em_binning}()},
+\code{\link{change_e}()},
+\code{\link{change_f}()},
+\code{\link{change_maturity}()},
+\code{\link{change_retro}()}
 }
 \author{
 Kotaro Ono, Carey McGilliard, and Kelli Johnson

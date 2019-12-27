@@ -5,8 +5,14 @@
 \title{Sample conditional age-at-length (CAL) data and write to file for use by
 the EM.}
 \usage{
-sample_calcomp(dat_list, outfile, fleets = c(1, 2), years,
-  write_file = TRUE, Nsamp)
+sample_calcomp(
+  dat_list,
+  outfile,
+  fleets = c(1, 2),
+  years,
+  write_file = TRUE,
+  Nsamp
+)
 }
 \arguments{
 \item{dat_list}{An SS data list object as read in from
@@ -69,10 +75,13 @@ if specified.
 }
 
 \seealso{
-Other sampling functions: \code{\link{clean_data}},
-  \code{\link{sample_agecomp}}, \code{\link{sample_index}},
-  \code{\link{sample_lcomp}}, \code{\link{sample_mlacomp}},
-  \code{\link{sample_wtatage}}
+Other sampling functions: 
+\code{\link{clean_data}()},
+\code{\link{sample_agecomp}()},
+\code{\link{sample_index}()},
+\code{\link{sample_lcomp}()},
+\code{\link{sample_mlacomp}()},
+\code{\link{sample_wtatage}()}
 }
 \author{
 Cole Monnahan, Kotaro Ono
