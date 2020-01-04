@@ -318,10 +318,10 @@ if(!is.null(par_name)) {
    if (all(c("nseas", "readAll") %in% names(formals(SS_readforecast)))) {
      ss3.for <- SS_readforecast(file = for_file_in, Nfleets = dat_list$Nfleet,
      Nareas = dat_list$N_areas, verbose = verbose,
-     nseas = 1, readAll = TRUE)
+     nseas = 1, readAll = TRUE, version="3.24")
    } else {
       ss3.for <- SS_readforecast(file = for_file_in, Nfleets = dat_list$Nfleet,
-        Nareas = dat_list$N_areas, verbose = verbose)
+        Nareas = dat_list$N_areas, verbose = verbose, version="3.24")
    }
    ss3.for$Forecast <- 2 #Fish at F(MSY)
    ss3.for$Nforecastyrs <- forecast_num

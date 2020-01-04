@@ -208,12 +208,12 @@ ss3sim_base <- function(iterations, scenarios, f_params,
         iterations = i, type = "em")
       if(iteration_existed)
           next
-
+	
       # Make fake .dat files to silence SS3/ADMB:
       fake_dat <- c("om/ss3_24o_opt.dat", "om/ss3_24o_safe.dat",
         "em/ss3_24o_opt.dat", "em/ss3_24o_safe.dat")
       sapply(fake_dat, function(fi) write("\n", pastef(pastef(sc, i, fi))))
-
+	
       # If we're bias adjusting, then copy over the .ctl file to the
       # em folder
       if(bias_already_run) {
@@ -291,8 +291,10 @@ ss3sim_base <- function(iterations, scenarios, f_params,
                                         calcomp_params  = calcomp_params,
                                         mlacomp_params  = mlacomp_params,
                                         wtatage_params  = wtatage_params)
+
       datfile.orig <- SS_readdat(pastef(sc, i, "om", "ss3.dat"),
                                  verbose = FALSE)
+
       datfile.orig <- change_fltname(datfile.orig)
 
 	  datfile.origsave <- datfile.orig
@@ -332,6 +334,7 @@ ss3sim_base <- function(iterations, scenarios, f_params,
                             data_out = pastef(sc, i, "em", "ss3.dat"))
       ## Read in the datfile once and manipulate as a list object, then
       ## write it back to file at the end, before running the EM.
+
       dat_list <- SS_readdat(pastef(sc, i, "em", "ss3.dat"),
                             verbose = FALSE)
       dat_list <- change_fltname(dat_list)
@@ -437,6 +440,7 @@ ss3sim_base <- function(iterations, scenarios, f_params,
                                          Nsamp            = Nsamp,
                                          write_file       = FALSE))
       }
+
       ## Manipulate EM starter file for a possible retrospective analysis
       if(!is.null(retro_params)) {
       retro_params <- add_nulls(retro_params, "retro_yr")
@@ -498,6 +502,7 @@ dat_list <- sample_econ(functionname2,datfile.origsave,dat_list2)
         estim_params <- add_nulls(estim_params,
           c("natM_type", "natM_n_breakpoints", "natM_lorenzen", "natM_val",
             "par_name", "par_int", "par_phase", "forecast_num"))
+
         dat_list <- with(estim_params,
          change_e(ctl_file_in          = "em.ctl",
                   ctl_file_out         = "em.ctl",
