@@ -197,7 +197,7 @@ run_ss3sim <- function(iterations, scenarios, case_folder,
       em_binning_params = a$em_binning,
       retro_params      = a$retro,
       estim_params      = a$E,
-	  functionname		= a$econ)
+	  econ_params		= a$econ)
   })
 
   # Note that inside a foreach loop you pop out of your current

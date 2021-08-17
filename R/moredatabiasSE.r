@@ -168,6 +168,7 @@ sep=",", row.names=FALSE, quote = FALSE)
 
 # dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))
 dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/mean(dattemp$CPUE$obs))^2)))
+dattemp$CPUE$se_log <- 0.2
 
 dat_list$CPUE <- rbind(dat_list$CPUE, dattemp$CPUE)
 

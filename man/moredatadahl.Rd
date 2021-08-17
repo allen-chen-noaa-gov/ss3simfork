@@ -2,9 +2,9 @@
 % Please edit documentation in R/moredatadahl.r
 \name{moredatadahl}
 \alias{moredatadahl}
-\title{moredata}
+\title{moredatadahl}
 \usage{
-moredatadahl(datfile.origsave, dat_list)
+moredatadahl(datfile.origsave, dat_list, locnum, obsnum, betavar, uparams, ...)
 }
 \arguments{
 \item{datfile.origsave}{description}
@@ -12,5 +12,5 @@ moredatadahl(datfile.origsave, dat_list)
 \item{dat_list}{description}
 }
 \description{
-moredata
+moredatadahl
 }

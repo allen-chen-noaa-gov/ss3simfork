@@ -180,7 +180,7 @@ ss3sim_base <- function(iterations, scenarios, f_params,
   user_recdevs = NULL, user_recdevs_warn = TRUE, bias_adjust = FALSE,
   bias_nsim = 5, bias_already_run = FALSE, hess_always = FALSE,
   print_logfile = TRUE, sleep = 0, conv_crit = 0.2, seed = 21,
-  keep_compreport = TRUE, functionname = NULL, ...) {
+  keep_compreport = TRUE, econ_params = NULL, ...) {
 
   # In case ss3sim_base is stopped before finishing:
   old_wd <- getwd()
@@ -478,9 +478,11 @@ ss3sim_base <- function(iterations, scenarios, f_params,
 ############################################################################################################
 ############################################################################################################
 ############################################################################################################
-functionname2 <- get(functionname[[1]])
-dat_list2 <- dat_list
-dat_list <- sample_econ(functionname2,datfile.origsave,dat_list2)
+functionnamein <- get(econ_params$functionname)
+dat_listin <- dat_list
+dat_list <- sample_econ(functionnamein,datfile.origsave,dat_listin,
+    econ_params$locnum, econ_params$obsnum, econ_params$betavar, 
+    econ_params$uparams)
 ############################################################################################################
 ############################################################################################################
 ############################################################################################################

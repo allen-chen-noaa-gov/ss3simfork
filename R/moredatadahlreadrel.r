@@ -9,7 +9,7 @@
 moredatadahlreadrel <- function(datfile.origsave,dat_list){
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
-dahldirout <- "C:/Users/Allen/Desktop/abund_indices/dahldat/flatalpha6/"
+dahldirout <- "C:/Users/allen.chen/SS3SIM_SCRATCH/dahldat/"
 
 abundtitle2 <- gsub("/", "-", abundtitle)
 abundtitle3 <- gsub(".*-", "", abundtitle2)

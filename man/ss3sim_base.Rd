@@ -33,7 +33,7 @@ ss3sim_base(
   conv_crit = 0.2,
   seed = 21,
   keep_compreport = TRUE,
-  functionname = NULL,
+  econ_params = NULL,
   ...
 )
 }
