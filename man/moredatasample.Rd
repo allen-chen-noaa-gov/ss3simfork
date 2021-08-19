@@ -2,9 +2,20 @@
 % Please edit documentation in R/moredatasample.r
 \name{moredatasample}
 \alias{moredatasample}
-\title{moredata}
+\title{moredatasample}
 \usage{
-moredatasample(datfile.origsave, dat_list)
+moredatasample(
+  datfile.origsave,
+  dat_list,
+  locnum,
+  obsnum,
+  betavar,
+  uparams,
+  abundse = NULL,
+  abundscale = NULL,
+  filename = NULL,
+  ...
+)
 }
 \arguments{
 \item{datfile.origsave}{description}
@@ -12,5 +23,5 @@ moredatasample(datfile.origsave, dat_list)
 \item{dat_list}{description}
 }
 \description{
-moredata
+moredatasample
 }

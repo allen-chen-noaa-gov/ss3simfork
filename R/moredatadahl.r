@@ -7,7 +7,7 @@
 #' @export
 
 moredatadahl <- function(datfile.origsave,dat_list,locnum,obsnum,betavar,
-    uparams,...){
+    uparams,abundse=NULL,abundscale=NULL,filename=NULL,...){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
 						fleets          = 2,
@@ -17,18 +17,22 @@ dattemp <- sample_index(dat_list        = datfile.origsave,
 						
 realcpue <- (datfile.origsave$CPUE[74:100,])
 
-scaleq <- mean(realcpue$obs)/sum(betavar)
-		
-scalecatch <- realcpue$obs/mean(realcpue$obs)
+if (is.null(abundscale) == TRUE) {
+    scaleq <- mean(realcpue$obs)/sum(betavar)
+} else {
+    scaleq <- abundscale
+}
 
-################################################################################
-################################################################################
-################################################################################
+scalecatch <- realcpue$obs/mean(realcpue$obs)
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 
-abundfile <- paste0(getwd(), "/", abundtitle, "/rel-se-abund-", 
-    gsub("/", "-", abundtitle), ".csv")
+if (is.null(filename) == TRUE) {
+    abundfile <- paste0(getwd(), "/", abundtitle, "/cor-abund-", 
+        gsub("/", "-", abundtitle), ".csv")
+} else {
+    abundfile <- paste0(filename,  gsub(".*/","",abundtitle), ".csv")
+}
 
 if (file.exists(abundfile) == FALSE) {
     
@@ -37,10 +41,10 @@ for (i in 1:length(scalecatch)) {
 
 library(barebones.FishSET)
 
-betavar <- as.matrix(betavar)*scalecatch[i]
+betavarin <- as.matrix(betavar)*scalecatch[i]
 kk <- dim(locnum)[1]
 
-otherdatfin <- spatial_fishery(locnum,obsnum,betavar,uparams)
+otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams)
 
 polyn <- 3
 polyintnum <- 1
@@ -56,20 +60,20 @@ otherdatfin$singlecor <- singlecor
 zifin <- do.call(cbind,otherdatfin$intdat)
 
 if (regconstant == 1) {
-    initparams <- unname(c(1, betavar, rep(0, 
+    initparams <- unname(c(1, betavarin, rep(0, 
         (((polyn+polyconstant)*(1+(1-singlecor))) + polyintnum)*kk), 
         rep(-1,dim(zifin)[2]), 1))
     #Initial paramters for revenue then cost.
 } else {
-    initparams <- unname(c(1, betavar, rep(0, 
+    initparams <- unname(c(1, betavarin, rep(0, 
         (((polyn+polyconstant)*(1+(1-singlecor))) + polyintnum)*kk), 
         rep(-1,dim(zifin)[2]), 1))
 }
 
 optimOpt <- c(100000,1.00000000000000e-08,1,0) 
-#Optimization options for the maximum number of
-#function evaluations, maximum iterations, and the relative tolerance of x.
-#Then, how often to report output, and whether to report output.
+#Optimization options for the maximum number of function evaluations, 
+#maximum iterations, and the relative tolerance of x. Then, how often to report 
+#output, and whether to report output.
 
 methodname = "BFGS"
 
@@ -87,12 +91,12 @@ initcount <- 0
 searchspace <- 1000
 
 if (regconstant == 1) {
-changevec <- unname(c(1, rep(0, length(betavar)),
+changevec <- unname(c(1, rep(0, length(betavarin)),
     rep(1, (((polyn+polyconstant)*(1+(1-singlecor))) + polyintnum)*kk), 
     rep(1,dim(zifin)[2]), 1)) 
     # Initial paramters for revenue then cost.
 } else {
-changevec <- unname(c(1, rep(0, length(betavar)),
+changevec <- unname(c(1, rep(0, length(betavarin)),
     rep(1, (((polyn+polyconstant)*(1+(1-singlecor))) + polyintnum)*kk), 
     rep(1,dim(zifin)[2]), 1)) 
 }
@@ -106,7 +110,6 @@ LLmat <- data.frame(cbind(1:searchspace,unlist(results$saveLLstarts)))
 LLmatorder <- LLmat[order(LLmat$X2),]
 
 initparamssave <- results$savestarts[LLmatorder$X1[1:100]]
-browser()
 
 while ((any(is.na(as.numeric(results_savev$OutLogit[,2]))) == TRUE ||
     results_savev$OutLogit[1,1] < 0) & initcount < 20) {
@@ -121,13 +124,17 @@ results_savev <- discretefish_subroutine(otherdatfin$catchfin,
 
 }
 
-newabund[i] <- sum(results_savev$OutLogit[2:(kk+1),1])*scaleq
-
-browser()
+if (is.numeric(results_savev$OutLogit[2:(kk+1),1]) == FALSE ||
+    any(is.na(as.numeric(results_savev$OutLogit[,2]))) == TRUE) {
+    newabund[i] <- NA
+} else {
+    newabund[i] <- sum(results_savev$OutLogit[2:(kk+1),1])*scaleq
+}
 
 }
 
 dattemp$CPUE$obs <- unlist(newabund)
+dattemp$CPUE[is.na(dattemp$CPUE$obs)==FALSE,]
 dattemp$CPUE$index <- 3
 
 abundout <- merge(realcpue, dattemp$CPUE,  by = c("year", "seas"))
@@ -141,20 +148,11 @@ abundout$diffperc = (abundout$TrueCPUE - abundout$DahlCPUE)/abundout$TrueCPUE
 
 abundout <- abundout[order(abundout$year),]
 
-abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
-write.table(abundout, 
-file=paste0("C:\\Users\\Allen.Chen\\SS3SIM_SCRATCH\\080721_mortup4\\",
-    "abund_indices\\rel-se-abund-",gsub("/", "-", abundtitle),".csv"), 
-sep=",", row.names=FALSE, quote = FALSE)
+write.table(abundout, file=abundfile, sep=",", row.names=FALSE, quote = FALSE)
 
 } else {
 
-abundout <- read.table(paste0("C:\\Users\\Allen.Chen\\SS3SIM_SCRATCH\\", 
-    "080721_mortup4\\", "abund_indices\\rel-se-abund-",
-    gsub("/", "-", abundtitle),".csv"), sep=",", header=TRUE)
-# dattemp$CPUE$se_log <- mean(abs(abundout$diffperc))
-# dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/
-    #mean(dattemp$CPUE$obs))^2)))
+abundout <- read.table(abundfile, sep=",", header=TRUE)
 
 abundout <- abundout[order(abundout$year),]
 
@@ -163,7 +161,12 @@ dattemp$CPUE$index <- 3
 
 }
 
-dattemp$CPUE$se_log <- 0.2
+if (is.null(abundse) == TRUE) {
+    dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/
+        mean(dattemp$CPUE$obs))^2)))
+} else {
+    dattemp$CPUE$se_log <- abundse
+}
 
 dat_list$CPUE <- rbind(dat_list$CPUE, dattemp$CPUE)
 
