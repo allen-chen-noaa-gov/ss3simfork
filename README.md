@@ -28,15 +28,16 @@ Running the model
 -----------------
 
 Running the model is largely the same as before. A reproducible script
-is included below. The ggplot2, RColorBrewer, doParallel, and foreach
-packages can be found on CRAN. Please get ss3simfork and
-barebones.FishSET from their respective Github repositories.
+is included below. The ggplot2, RColorBrewer, plyr, doParallel, and
+foreach packages can be found on CRAN. Please get ss3simfork and
+[barebones.FishSET](https://github.com/allen-chen-noaa-gov/barebones.FishSET)
+from their respective Github repositories.
 
 ``` r
 library(devtools)
 #this assumes you've set the directory to wherever you've downloaded the 
 #packages
-install.packages(c("ss3simfork", "barebones.FishSET"))
+install.packages(c("barebones.FishSET", "ss3simfork"))
 ```
 
 The first three packages run the model, and the latter two are just for
@@ -49,6 +50,7 @@ library(doParallel)
 library(foreach)
 
 #for making the plots
+library(plyr)
 library(ggplot2)
 library(RColorBrewer)
 ```
@@ -182,6 +184,7 @@ subsetlist <- c("D1","D2","D3","D4")
 ts_dat_sto <- subset(ts_dat, D %in% subsetlist)
 
 ts_dat_sto$D <- as.factor(ts_dat_sto$D)
+
 ts_dat_sto$D <- revalue(ts_dat_sto$D, c(
     "D1"="Quadrennial fishery-independent survey",
     "D2"="+ Annual randomly-sampled fishery data",
