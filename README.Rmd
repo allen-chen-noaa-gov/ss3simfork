@@ -12,7 +12,7 @@ This is a fork of the ss3sim package that incorporates a spatial economic
 model, testing the use of corrected fishery-dependent abundance indices.
 
 Please refer to the [ss3sim Github](https://github.com/ss3sim/ss3sim) for 
-documentation and the original repository. This readme outlines chhanges to 
+documentation and the original repository. This readme outlines changes to 
 that original repository.
 
 ## Where the economic model interacts with ss3sim
@@ -74,11 +74,12 @@ case_folder <- paste0(nicedir, "\\eg-cases")
 
 The primary difference is that there is an extra "econ" case file in the
 eg-cases folder now. The example cases below can be found in the 
-inst\extdata\econ\eg-cases folder in the package, to be copied into the 
+inst\\extdata\\econ\\eg-cases folder in the package, to be copied into the 
 directory you chose above.
 
-An example econ file is shown below. The econ case file specifies the economic 
-model and sampling process in `functionname`. There are currently four options: 
+An example econ case file is shown below. The econ case file specifies the 
+economic model and sampling process in `functionname`. There are currently four 
+options: 
 1) `nodata` adds no additional data, 
 2) `moredatabias` allows fishers to sample based on their preferences, and 
 uses those samples to construct abundance indices without correction,
@@ -92,7 +93,7 @@ grid is specified in `locnum`. Then, `obsnum` describes the number of
 observations simulated at each location, `betavar` the parameters dictating 
 average catches at each location, and `uparams` the utility function parameters 
 describing the fisher's preferences. If you specify a file name, abundance 
-indices will be written to the speciifed folder and name, ending in the ss3sim 
+indices will be written to the specified folder and name, ending in the ss3sim 
 iteration number. Otherwise it will be written to each ss3sim iteration folder.
 
 ```{r, eval=FALSE}
@@ -226,7 +227,7 @@ We can also look at the relative abundance indices across different sampling
 patterns.
 
 ```{r, eval=FALSE}
-#I saved my abundance indices to my raw output directory. This could be 
+#I saved my abundance indices to my raw output directory. This would be 
 #specified in the econ case file.
 abunddir <- paste0(rawoutputdir, "\\abund_indices\\")
 abundout <- list()
@@ -304,4 +305,34 @@ lineout = ggplot(data = linegraph,
 print(lineout)
 ```
 
-![Abundance indices output example](https://raw.github.com/allen-chen-noaa/ss3simfork/master/inst/extdata/econ/abundline_081821_mortup4.png
+![Abundance indices output example](https://raw.github.com/allen-chen-noaa/ss3simfork/master/inst/extdata/econ/abundline_081821_mortup4.png)
+
+## Next steps
+
+The way the econ case files are set up there are a few places to expand the
+analysis in a fairly straightforward manner.  
+
+1) Include more locations for robustness. This only involves editing the 
+distance matrix and betavar. Likely 9 or 12 locations as long as this seems 
+sufficient, because run time gets imposing (if one run of the economic model 
+takes one hour, but for each year, and each iteration, that's 2600 hours 
+divided by the number of workers avaiable).  
+
+2) Randomize or add a spatial trend to the betavar. Currently they're static. 
+We could randomize the locations so some locations have greater catches in some 
+years, but not others. Or, have fish moving northward during the time period. I 
+expect the economic model to still work fairly well actually, until we...  
+
+3) Change the number of chosen observations at locations. There are likely two 
+different ways to do so. The first is to just have some locations with very few 
+or no starting observations (a fisher starts in a location, then gets to choose 
+where to go). The `obsnum` variable in the econ case file can currently take a 
+vector of length equal to the number of locations. Or, we can also try and 
+change the fisher utility parameters to for example find travel very costly. 
+Then vessels may not travel to some locations (as long as none were seeded 
+there).  
+
+4) In general while doing these robustness checks, it would be good to get 
+input and think about what real-world fisheries these examples are most 
+relevant to. And, we can complicate the way catches are modeled, or abundance 
+is distributed spatially, if things seem too simplified.
