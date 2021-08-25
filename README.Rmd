@@ -37,7 +37,8 @@ from their respective Github repositories.
 library(devtools)
 #this assumes you've set the directory to wherever you've downloaded the 
 #packages
-install.packages(c("barebones.FishSET", "ss3simfork"))
+install("barebones.FishSET")
+install("ss3simfork")
 ```
 
 The first three packages run the model, and the latter two are just for making 
