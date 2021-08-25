@@ -233,7 +233,7 @@ abundout <- list()
 for (it in 1:100) {
 
 #The default naming convention for each abundance index .csv is below, if 
-the file name is left NULL, but can be specified if desired.
+#the file name is left NULL, but can be specified if desired.
 
 casename <- paste0(rawoutputdir, "\\D3-E1-F2-M0-cod\\", it, 
     "\\bias-abund-D3-E1-F2-M0-cod-")
