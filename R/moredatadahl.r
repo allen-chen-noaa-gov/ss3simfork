@@ -4,6 +4,10 @@
 #' @param datfile.origsave description
 #' @param dat_list description
 #'
+#' @importFrom barebones.FishSET logit_correction_polyint_estscale
+#' @importFrom barebones.FishSET discretefish_subroutine
+#' @importFrom barebones.FishSET explore_startparams
+#'
 #' @export
 
 moredatadahl <- function(datfile.origsave,dat_list,locnum,obsnum,betavar,
@@ -81,9 +85,9 @@ bw <- -1
 
 otherdatfin$bw <- bw
 
-func <- logit_correction_polyint_estscale
+func <- barebones.FishSET::logit_correction_polyint_estscale
 
-results_savev <- discretefish_subroutine(otherdatfin$catchfin,
+results_savev <- barebones.FishSET::discretefish_subroutine(otherdatfin$catchfin,
     otherdatfin$choicefin,otherdatfin$distance,otherdatfin,initparams,
     optimOpt,func,methodname)
     
@@ -101,7 +105,7 @@ changevec <- unname(c(1, rep(0, length(betavarin)),
     rep(1,dim(zifin)[2]), 1)) 
 }
 
-results <- explore_startparams(searchspace, initparams, dev = 2, 
+results <- barebones.FishSET::explore_startparams(searchspace, initparams, dev = 2, 
     logit_correction_polyint, otherdatfin$catchfin, otherdatfin$choicefin, 
     otherdatfin$distance, otherdatfin,
     changevec)
@@ -118,7 +122,7 @@ initcount <- initcount + 1
     
 initparams <- initparamssave[[initcount]]
 
-results_savev <- discretefish_subroutine(otherdatfin$catchfin,
+results_savev <- barebones.FishSET::discretefish_subroutine(otherdatfin$catchfin,
     otherdatfin$choicefin,otherdatfin$distance,otherdatfin,initparams,
     optimOpt,func,methodname)
 
@@ -142,9 +146,9 @@ abundout$index.x <- NULL
 abundout$se_log.x <- NULL
 abundout$index.y <- NULL
 names(abundout)[names(abundout) == "obs.x"] <- "TrueCPUE"
-names(abundout)[names(abundout) == "obs.y"] <- "DahlCPUE"
+names(abundout)[names(abundout) == "obs.y"] <- "EstCPUE"
 
-abundout$diffperc = (abundout$TrueCPUE - abundout$DahlCPUE)/abundout$TrueCPUE
+abundout$diffperc = (abundout$TrueCPUE - abundout$EstCPUE)/abundout$TrueCPUE
 
 abundout <- abundout[order(abundout$year),]
 
@@ -156,7 +160,7 @@ abundout <- read.table(abundfile, sep=",", header=TRUE)
 
 abundout <- abundout[order(abundout$year),]
 
-dattemp$CPUE$obs <- abundout$DahlCPUE
+dattemp$CPUE$obs <- abundout$EstCPUE
 dattemp$CPUE$index <- 3
 
 }

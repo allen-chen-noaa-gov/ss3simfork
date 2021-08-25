@@ -37,8 +37,6 @@ if (is.null(filename) == TRUE) {
 newabund <- list()
 for (i in 1:length(scalecatch)) { 
 
-library(barebones.FishSET)
-
 betavarin <- as.matrix(betavar)*scalecatch[i]
 kk <- dim(locnum)[1]
 
@@ -66,9 +64,9 @@ abundout$index.x <- NULL
 abundout$se_log.x <- NULL
 abundout$index.y <- NULL
 names(abundout)[names(abundout) == "obs.x"] <- "TrueCPUE"
-names(abundout)[names(abundout) == "obs.y"] <- "DahlCPUE"
+names(abundout)[names(abundout) == "obs.y"] <- "EstCPUE"
 
-abundout$diffperc = (abundout$TrueCPUE - abundout$DahlCPUE)/abundout$TrueCPUE
+abundout$diffperc = (abundout$TrueCPUE - abundout$EstCPUE)/abundout$TrueCPUE
 
 abundout <- abundout[order(abundout$year),]
 

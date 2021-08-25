@@ -6,199 +6,302 @@ output:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, echo = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-figs/",
-  cache.path = "README-cache/"
-)
+# ss3simfork
+
+This is a fork of the ss3sim package that incorporates a spatial economic 
+model, testing the use of corrected fishery-dependent abundance indices.
+
+Please refer to the [ss3sim Github](https://github.com/ss3sim/ss3sim) for 
+documentation and the original repository. This readme outlines chhanges to 
+that original repository.
+
+## Where the economic model interacts with ss3sim
+
+The primary interaction the economic model has with ss3sim is to potentially 
+add an additional abundance index to the estimating model. During a standard 
+run, ss3sim produces a "true" abundance index by year in its operating model. 
+The economic model then takes that true abundance and distributes it across a 
+spatial grid as defined by the analyst. Then in each year fishers sample across 
+the spatial grid depending on some specified sampling pattern, and those 
+samples are used to construct an estimate of abundance in that year. This index 
+can then be used in the estimating model.
+
+## Running the model
+
+Running the model is largely the same as before. A reproducible script is 
+included below. The ggplot2, RColorBrewer, doParallel, and foreach packages can 
+be found on CRAN. Please get ss3simfork and barebones.FishSET from their 
+respective Github repositories.
+
+```{r, eval=FALSE}
+library(devtools)
+#this assumes you've set the directory to wherever you've downloaded the 
+#packages
+install.packages(c("ss3simfork", "barebones.FishSET"))
 ```
 
-# ss3sim
+The first three packages run the model, and the latter two are just for making 
+the plots.
 
-[![Build Status](https://travis-ci.org/ss3sim/ss3sim.png?branch=master)](https://travis-ci.org/ss3sim/ss3sim)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/ss3sim/ss3sim?branch=master&svg=true)](https://ci.appveyor.com/project/ss3sim/ss3sim)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/ss3sim)](https://cran.r-project.org/package=ss3sim)
+```{r, eval=FALSE}
+#for running the model
+library(ss3simfork)
+library(doParallel)
+library(foreach)
 
-ss3sim is an R package that facilitates flexible, rapid, and reproducible fisheries stock assessment simulation testing with the widely-used [Stock Synthesis 3][SS3] (SS3) statistical age-structured stock assessment framework.
-
-## Contents
-
-- [Installing the ss3sim R package](#installing-the-ss3sim-r-package)
-- [The ss3sim simulation setup](#the-ss3sim-simulation-setup)
-- [How ss3sim works](#how-ss3sim-works)
-- [Example output from an ss3sim simulation](#example-output-from-an-ss3sim-simulation)
-- [Papers published using ss3sim](#papers-published-using-ss3sim)
-- [Citing ss3sim](#citing-ss3sim)
-
-<!-- end toc -->
-
-## Installing the ss3sim R package
-
-Install the [CRAN version](https://cran.r-project.org/package=ss3sim) of ss3sim with:
-
-```R
-install.packages("ss3sim")
+#for making the plots
+library(ggplot2)
+library(RColorBrewer)
 ```
 
-Or, install the development version from GitHub:
+We use the "cod-like" species that is in the ss3sim package. We also set two
+directories, one where we put the cases, and the other where the raw output is 
+written. You could choose the same directory if you wanted.
 
-```R
-# install.packages("devtools")
-devtools::install_github("ss3sim/ss3sim") # without vignettes (faster)
-devtools::install_github("ss3sim/ss3sim", build_vignettes = TRUE) # with vignettes
+```{r, eval=FALSE}
+d <- system.file("extdata", package = "ss3simfork")
+om <- paste0(d, "/models/cod-om")
+em <- paste0(d, "/models/cod-em")
+
+#rawoutputdir for files (iterations and scenarios)
+rawoutputdir <- #enter your preferred directory here
+
+#nicedir for cases
+nicedir <- #enter your preferred directory here; a folder eg-cases should be
+    #in this directory containing the case files.
+case_folder <- paste0(nicedir, "\\eg-cases")
 ```
 
-We'd suggest using the GitHub version since it comes with SS3 executables/binaries. If you're using the CRAN version, you'll need to install these binaries and place them in your system path. ss3sim requires a specific version of the SS3 binary/executable. With the permission of Rick Methot, we have hosted those files [here](https://github.com/ss3sim/ss3sim/tree/master/inst/bin). See the Introduction vignette with `vignette("introduction", "ss3sim")` for more details.
+The primary difference is that there is an extra "econ" case file in the
+eg-cases folder now. The example cases below can be found in the 
+inst\extdata\econ\eg-cases folder in the package, to be copied into the 
+directory you chose above.
 
-If you would like to run simulations in parallel, then also run:
+An example econ file is shown below. The econ case file specifies the economic 
+model and sampling process in `functionname`. There are currently four options: 
+1) `nodata` adds no additional data, 
+2) `moredatabias` allows fishers to sample based on their preferences, and 
+uses those samples to construct abundance indices without correction,
+3) `moredatasample` has fishers randomly sample a location, not based on their 
+preferences, and uses those samples to construct abundance indices, and
+4) `moredatadahl` has fishers sample based on their preferences, but uses those 
+samples in a process correcting for selection bias, creating abundance indices. 
 
-```R
-install.packages(c("doParallel", "foreach"))
+A matrix describing the distances to each respective location in the spatial
+grid is specified in `locnum`. Then, `obsnum` describes the number of 
+observations simulated at each location, `betavar` the parameters dictating 
+average catches at each location, and `uparams` the utility function parameters 
+describing the fisher's preferences. If you specify a file name, abundance 
+indices will be written to the speciifed folder and name, ending in the ss3sim 
+iteration number. Otherwise it will be written to each ss3sim iteration folder.
+
+```{r, eval=FALSE}
+functionname; nodata
+locnum; rbind(c(0.0, 0.5, 0.5, 0.707), c(0.5, 0.0, 0.707, 0.5), c(0.5, 0.707, 0, 0.5), c(0.707, 0.5, 0.5, 0))*3
+obsnum; 500
+betavar; c(1.50, 1.25, 1.00, 0.75)
+uparams; list(alpha = 3, betac = -1)
+abundse; NULL
+abundscale; NULL
+filename; NULL
 ```
 
-You can then load ss3sim with:
+This case file then gets used in the run_ss3sim call. 
 
-```R
-library("ss3sim")
+You should check how many workers your machine can use. With 8 workers it 
+took about 2 days.
+
+```{r, eval=FALSE}
+#This is directory where RAW output get written
+setwd(rawoutputdir) 
+
+#The current directory when you register parallel cores is the directory output 
+#gets written
+registerDoParallel(cores = #8) 
+
+print(Sys.time())
+begtime <- Sys.time()
+
+run_ss3sim(iterations = 1:100, scenarios =
+     c(
+    "D1-E1-F2-M0-cod", 
+    "D2-E1-F2-M0-cod", 
+    "D3-E1-F2-M0-cod", 
+    "D4-E1-F2-M0-cod"
+     ),
+  case_files = list(F = "F", D = c("index", "lcomp", "agecomp", "econ"),
+    E = "E", M = "M"),
+  case_folder = case_folder, om_dir = om,
+  em_dir = em, bias_adjust = FALSE, parallel = TRUE, parallel_iterations = TRUE)
+#I thought I remembered something about a problem with bias_adjust?
+  
+endtime <- Sys.time()
+print(Sys.time())
+
+endtime - begtime
+```
+The operating model runs the same as before. Now, during the estimating model, 
+in `ss3sim_base`, there is an additional `sample_econ` call that runs the 
+function specified in the econ case file. As part of this process the 
+`spatial_fishery` function takes the abundance in each year and distributes it 
+according to the `betavar` parameters across the designated spatial grid. Then, 
+depending on the sampling process specified, an index of abundance is 
+estimated.
+
+## Some results
+
+Using the function from the ss3sim package, we can grab aggregated results 
+`scalar_dat` and `ts_dat`. 
+
+```{r, eval=FALSE}
+get_results_all(directory = rawoutputdir, 
+    overwrite_files = TRUE, 						
+    #this writes to rawoutputdir even if you set a nicedir before call
+    user_scenarios = 
+    c(    
+    "D1-E1-F2-M0-cod", 
+    "D2-E1-F2-M0-cod", 
+    "D3-E1-F2-M0-cod", 
+    "D4-E1-F2-M0-cod"
+    ), 
+    parallel = TRUE)
+		
+scalar_dat <- read.csv("ss3sim_scalar.csv")
+ts_dat <- read.csv("ss3sim_ts.csv")
+
+ts_dat$SpawnBio <- (SpawnBio_em - SpawnBio_om)/SpawnBio_om)
+  
+ts_dat <- merge(ts_dat, scalar_dat[,c("scenario", "replicate",
+    "max_grad")])
+
+subsetlist <- c("D1","D2","D3","D4")
+
+ts_dat_sto <- subset(ts_dat, D %in% subsetlist)
+
+ts_dat_sto$D <- as.factor(ts_dat_sto$D)
+ts_dat_sto$D <- revalue(ts_dat_sto$D, c(
+    "D1"="Quadrennial fishery-independent survey",
+    "D2"="+ Annual randomly-sampled fishery data",
+    "D3"="+ Annual uncorrected fishery data",
+    "D4"="+ Annual corrected fishery data"))
+    
+#Small values of the maximum gradient (approximately 0.001 or less) indicate 
+#that model convergence is likely. 
+#Larger values (greater than 1) indicate that model convergence is unlikely. 
+ts_dat_sto <- ts_dat_sto[ts_dat_sto$max_grad<1,] 
+
+test.50 <- ddply(ts_dat_sto, .(E,year), summarise, 
+    five0 = quantile(SpawnBio, probs = c(0.5), na.rm = TRUE))
+
+test.05 <- ddply(ts_dat_sto, .(E,year), summarise, 
+    zero5 = quantile(SpawnBio, probs = c(0.025), na.rm = TRUE))
+test.95 <- ddply(ts_dat_sto, .(E,year), summarise, 
+    nine5 = quantile(SpawnBio, probs = c(0.975), na.rm = TRUE))
+test.25 <- ddply(ts_dat_sto, .(E,year), summarise, 
+    two5 = quantile(SpawnBio, probs = c(0.25), na.rm = TRUE))
+test.75 <- ddply(ts_dat_sto, .(E,year), summarise, 
+    seven5 = quantile(SpawnBio, probs = c(0.75), na.rm = TRUE))    
+test.05$nine5 <- test.95$nine5
+test.05$two5 <- test.25$two5
+test.05$seven5 <- test.75$seven5
+
+p <- ggplot(test.05, aes(x = year)) + xlab("Year") +
+    theme_bw() + 
+	geom_ribbon(data = test.05, aes(ymin = zero5, ymax = nine5), alpha = 0.50, 
+        fill = "#4682b4") +
+	geom_ribbon(data = test.05, aes(ymin = two5, ymax = seven5), alpha = 0.75, 
+        fill = "#4682b4") +
+	theme(text = element_text(size=30), axis.title.y=element_text(vjust=1.5)) + 
+	geom_line(data=test.50, aes(y=five0, x = year), colour="black") +
+	ylim(-0.55,0.55) + ylab("Relative Error in Spawning Biomass") + 
+    xlab("Year") +
+	# theme(axis.text.x = element_text(angle=45, hjust=0.1, vjust=0.1)) + 
+	facet_wrap(~D, ncol=2)
+print(p)
 ```
 
-You can read the help files with:
+![Spawning biomass output example](https://raw.github.com/allen-chen-noaa/ss3simfork/master/inst/extdata/econ/SB_081821_mortup4.png)
 
-```R
-?ss3sim
+We can also look at the relative abundance indices across different sampling 
+patterns.
+
+```{r, eval=FALSE}
+#I saved my abundance indices to my raw output directory. This could be 
+#specified in the econ case file.
+abunddir <- paste0(rawoutputdir, "\\abund_indices\\")
+abundout <- list()
+for (it in 1:100) {
+
+casename <- "bias-abund-D2341-E2341-F2-M0-cod-"
+abundtrue <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""),
+    type="True", istruecpue = TRUE)
+
+casename <- "bias-abund-D2341-E2341-F2-M0-cod-"
+abundbias <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""), 
+    type="Uncorrected")
+
+casename <- "cor-abund-D2341-E2341-F2-M0-cod-"
+abundcor <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""), 
+    type="Corrected")
+    
+casename <- "samp-abund-D2341-E2341-F2-M0-cod-"
+abundsamp <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""), 
+    type="Randomly sampled")
+    
+tempabundout <- rbind(abundtrue, abundbias, abundcor, abundsamp)
+
+tempabundout$iter <- it
+
+abundout[[it]] <- tempabundout
+
+}
+
+totabundout <- do.call(rbind, abundout)
+
+totabundout <- totabundout[totabundout$CPUE > 0, ]
+
+linegraph = aggregate(totabundout$RelDiff, 
+    list(Year = totabundout$year, Index = totabundout$Index), median)
+names(linegraph)[names(linegraph) == 'x'] = 'RelDiff'
+
+linegraphse = aggregate(totabundout$RelDiff, 
+    list(Year = totabundout$year, Index = totabundout$Index), sd)
+names(linegraphse)[names(linegraphse) == 'x'] = 'sd'
+
+linegraphlen = aggregate(totabundout$RelDiff, 
+    list(Year = totabundout$year, Index = totabundout$Index), length)
+names(linegraphlen)[names(linegraphlen) == 'x'] = 'len'
+
+linegraph = merge(linegraph, linegraphse, by=c("Year","Index"))
+linegraph = merge(linegraph, linegraphlen, by=c("Year","Index"))
+
+linegraph$se = linegraph$sd/sqrt(linegraph$len)
+
+linegraph$Index <- revalue(linegraph$Index , c("Corrected"="Corrected     ",
+    "Randomly sampled"="Randomly sampled     ",
+    "True"="True     ",
+    "Uncorrected"="Uncorrected     "))
+
+pd <- position_dodge(0.05)
+
+lineout = ggplot(data = linegraph, 
+		aes(x=Year, y=RelDiff)) + 
+        geom_line(aes(colour=Index, group=Index),size=2, position=pd) +
+		geom_point(aes(shape=Index), size=4, fill="white", stroke = 1.5, 
+            position=pd) + 
+		xlab("Year") + ylab("Relative Differences in Abundance") +
+		geom_hline(yintercept=1, linetype="dashed", color = "orange", size=2) +
+		guides(colour = guide_legend(override.aes = list(size=6))) +
+		theme(legend.direction = 'horizontal', legend.position = 'top', 
+            legend.key = element_rect(size = 4), 
+            legend.text = element_text(size=22),
+            legend.key.size = unit(2.5, 'lines'), legend.title=element_blank(), 
+            axis.text.x = element_text(angle = 45, hjust = 1),
+            text = element_text(size=30), 
+            axis.title.y=element_text(vjust=1.5)) +
+		scale_shape_manual(values=c(21,22,25,24)) + 
+        scale_colour_manual(values=brewer.pal(4,"Set1"))
+print(lineout)
 ```
 
-and access the vignettes for reproducible examples of ss3sim simulations with:
-
-```R
-browseVignettes("ss3sim")
-```
-
-In addition to the vignette, we published a [paper][paper] in PLOS ONE, which describes the package.
-
-## The ss3sim simulation setup
-
-An ss3sim simulation requires three types of input:
-
-1. a base model of the underlying truth (an SS3 operating model)
-2. a base model of how you will assess that truth (an SS3 estimation model),
-3. a set of cases that deviate from these base models that you want to compare (configuration arguments provided as plain-text control files).
-
-You can find examples of these SS3 operating and estimation models [within the
-package data][models]. Plain-text case files for some current simulation
-projects run by the developers of the package are [also available][cases]
-along with the [case files for the examples][eg-cases] used in the paper and
-vignette.
-
-![An illustration of the input and output file and folder structure.](https://raw.githubusercontent.com/ss3sim/ss3sim/f763cfb462a9e68db670155070cd554812a65160/man/figures/filestructure.png)
-
-An illustration of the input and output file and folder structure.
-
-## How ss3sim works
-
-ss3sim works by converting simulation arguments (e.g. a given natural
-mortality trajectory) into manipulations of SS3 configuration files. It
-takes care of running the operating and estimation models as well as making
-these manipulations at the appropriate stage in the simulation.
-
-ss3sim functions are divided into three types:
-
-1. `change` and `sample` functions that manipulate SS configuration files. These
-   manipulations generate an underlying "truth" (operating models) and control
-   our assessment of those models (estimation models).
-
-2. `run` functions that conduct simulations. These functions generate a folder
-   structure, call manipulation functions, run SS3 as needed, and save the
-   output.
-
-3. `get` functions for synthesizing the output.
-
-## Example output from an ss3sim simulation
-
-![An example of ss3sim output](https://raw.github.com/seananderson/ss3sim/master/inst/ms/fig2-20131109.png)
-
-Example output from an ss3sim simulation. This example shows a crossed simulation in which we considered (1) the effect of fixing natural mortality (*M*) at its true value (0.2; case E0) or estimating *M* (case E1) and (2) the effect of high survey effort (sigma_survey = 0.1; case D0) or low survey effort (sigma_survey = 0.4; case D1). Upper panels (blue) show time series of relative error in spawning stock biomass (SSB). Lower panels (grey) show the distribution of relative error across four scalar variables: depletion, *M*, SSB at maximum sustainable yield (SSB_MSY), and fishing mortality (*F*) in the terminal year. We show the values across simulation iterations with dots and the distributions with beanplots (kernel density smoothers).
-
-## Papers published using ss3sim
-
-Stewart, I.J., C.C. Monnahan. 2016. Implications of process error in selectivity for approaches
-to weighting compositional data in fisheries stock assessments. Fisheries Research. In press.
-http://dx.doi.org/10.1016/j.fishres.2016.06.018. 
-([code repository](https://github.com/ss3sim/procdata)).
-
-Johnson, K.F., E. Councill, J.T. Thorson, E. Brooks, R.D. Methot, and A.E.
-Punt. 2016. Can autocorrelated recruitment be estimated using integrated
-assessment models and how does it affect population forecasts? Fisheries
-Research 183:222–232. <http://doi.org/10.1016/j.fishres.2016.06.004>.
-([code repository](https://github.com/kellijohnson/AR-perf-testing)).
-
-Kuriyama, P. T., K. Ono, F. Hurtado-Ferro, A. C. Hicks, I. G. Taylor, R. R.
-Licandeo, K. F. Johnson, S. C. Anderson, C. C. Monnahan, M. B. Rudd, C. C.
-Stawitz, and J. L. Valero. 2016. An empirical weight-at-age approach reduces
-estimation bias compared to modeling parametric growth in integrated,
-statistical stock assessment models when growth is time varying. Fisheries
-Research. 180:119–127. <http://doi.org/10.1016/j.fishres.2015.09.007>.
-([code repository](https://github.com/ss3sim/Empirical)).
-
-Monnahan, C. C., K. Ono, S. C. Anderson, M. B. Rudd, A. C. Hicks, F.
-Hurtado-Ferro, K. F. Johnson, P. T. Kuriyama, R. R. Licandeo, C. C. Stawitz, I.
-G. Taylor, and J. L. Valero. 2016. The effect of length bin width on growth
-estimation in integrated age-structured stock assessments. Fisheries Research.
-180:103–112 <http://doi.org/10.1016%2Fj.fishres.2015.11.002>.
-([code repository](https://github.com/ss3sim/binning)).
-
-Johnson, K.F., C.C. Monnahan, C.R. McGilliard, K.A. Vert-pre, S.C. Anderson,
-C.J. Cunningham, F. Hurtado-Ferro, R.R. Licandeo, M.L. Muradian, K. Ono, C.S.
-Szuwalski, J.L. Valero, A.R. Whitten, A.E. Punt. 2015. Time-varying natural
-mortality in fisheries stock assessment models: identifying a default approach.
-2015. ICES Journal of Marine Science 72 (1): 137-150
-<http://doi.org/10.1093/icesjms/fsu055>.
-([PDF](http://icesjms.oxfordjournals.org/content/early/2014/04/09/icesjms.fsu055.full.pdf?keytype=ref&ijkey=NEXmZIkz3289u3z);
-[code repository](https://github.com/ss3sim/natural-mortality "R code to
-recreate the simulation")).
-
-Hurtado-Ferro, F., C.S. Szuwalski, J.L. Valero, S.C. Anderson, C.J. Cunningham,
-K.F. Johnson, R.R. Licandeo, C.R. McGilliard, C.C. Monahan, M.L. Muradian, K.
-Ono, K.A. Vert-Pre, A.R. Whitten, A.E. Punt. 2015. Looking in the rear-view
-mirror: bias and retrospective patterns in integrated, age-structured stock
-assessment models. ICES Journal of Marine Science. 72 (1): 99-110
-<http://doi.org/10.1093/icesjms/fsu198>.
-
-Ono, K., R. Licandeo, M.L. Muradian, C.J. Cunningham, S.C. Anderson, F.
-Hurtado-Ferro, K.F. Johnson, C.R. McGilliard, C.C. Monnahan, C.S. Szuwalski,
-J.L. Valero, K.A. Vert-pre, A.R. Whitten, A.E. Punt. 2015. The importance of
-length and age composition data in statistical catch-at-age models for marine
-species. ICES Journal of Marine Science. 72 (1): 31-43.
-<http://doi.org/10.1093/icesjms/fsu007>
-([PDF](https://dl.dropboxusercontent.com/u/254940/papers/Ono_etal_2014_importance_of_length_and_age_composition_data.pdf)).
-
-Anderson, S.C., C.C. Monnahan, K.F. Johnson, K. Ono, J.L. Valero. ss3sim: An
-R package for fisheries stock assessment simulation with Stock Synthesis. 2014.
-PLOS ONE. 9(4): e92725. <http://doi.org/10.1371/journal.pone.0092725>
-([PDF](http://www.plosone.org/article/fetchObject.action?uri=info%3Adoi%2F10.1371%2Fjournal.pone.0092725&representation=PDF)).
-
-## Citing ss3sim
-
-If you use ss3sim in a publication, please cite ss3sim as shown by `citation("ss3sim")`:
-
-```{r, echo = FALSE}
-knitr::opts_chunk$set(comment = "")
-```
-
-```{r}
-citation("ss3sim")
-
-toBibtex(citation("ss3sim"))
-```
-
-[DESCRIPTION]: https://github.com/seananderson/ss3sim/blob/master/DESCRIPTION
-[models]: https://github.com/seananderson/ss3sim/tree/master/inst/extdata/models
-[cases]: https://github.com/seananderson/ss3sim/tree/master/inst/extdata/cases
-[eg-cases]: https://github.com/seananderson/ss3sim/tree/master/inst/extdata/eg-cases
-[vignette]: https://dl.dropboxusercontent.com/u/254940/ss3sim-vignette.pdf
-[paper]: http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0092725
-[SS3]: http://nft.nefsc.noaa.gov/Stock_Synthesis_3.htm
-[r-project]: http://www.r-project.org/
-[SAFS]: http://fish.washington.edu/
+![Abundance indices output example](https://raw.github.com/allen-chen-noaa/ss3simfork/master/inst/extdata/econ/abundline_081821_mortup4.png

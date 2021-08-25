@@ -208,7 +208,7 @@ run_ss3sim <- function(iterations, scenarios, case_folder,
   # to satisfy R CMD check in the foreach() call below
   x <- NULL
   it_ <- NULL
-
+  
   if (parallel) {
     if (parallel_iterations) {
       ignore <- lapply(arg_list, function(x) {

@@ -1,0 +1,8 @@
+functionname; nodata
+locnum; rbind(c(0.0, 0.5, 0.5, 0.707), c(0.5, 0.0, 0.707, 0.5), c(0.5, 0.707, 0, 0.5), c(0.707, 0.5, 0.5, 0))*3
+obsnum; 500
+betavar; c(1.50, 1.25, 1.00, 0.75)
+uparams; list(alpha = 3, betac = -1)
+abundse; 0.2
+abundscale; 500
+filename; "C:\\Users\\Allen.Chen\\SS3SIM_SCRATCH\\082321_mortup4_test\\abund_indices\\no-abund-E1-F2-M0-cod-"
