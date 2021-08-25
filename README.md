@@ -224,7 +224,7 @@ print(p)
 ```
 
 ![Spawning biomass output
-example](https://raw.githubusercontent.com/allen-chen-noaa-gov/ss3simfork/master/inst/extdata/econ/SB_081821_mortup4.png)
+example](https://github.com/allen-chen-noaa-gov/ss3simfork/blob/master/inst/extdata/econ/SB_081821_mortup4.png?raw=true)
 
 We can also look at the relative abundance indices across different
 sampling patterns.
@@ -309,7 +309,7 @@ print(lineout)
 ```
 
 ![Abundance indices output
-example](https://raw.githubusercontent.com/allen-chen-noaa-gov/ss3simfork/master/inst/extdata/econ/abundline_081821_mortup4.png)
+example](https://github.com/allen-chen-noaa-gov/ss3simfork/blob/master/inst/extdata/econ/abundline_081821_mortup4.png?raw=true)
 
 Next steps
 ----------
