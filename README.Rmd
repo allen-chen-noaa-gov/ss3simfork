@@ -229,26 +229,30 @@ We can also look at the relative abundance indices across different sampling
 patterns.
 
 ```{r, eval=FALSE}
-#I saved my abundance indices to my raw output directory. This would be 
-#specified in the econ case file.
-abunddir <- paste0(rawoutputdir, "\\abund_indices\\")
 abundout <- list()
 for (it in 1:100) {
 
-casename <- "bias-abund-D2341-E2341-F2-M0-cod-"
-abundtrue <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""),
+#The default naming convention for each abundance index .csv is below, if 
+the file name is left NULL, but can be specified if desired.
+
+casename <- paste0(rawoutputdir, "\\D3-E1-F2-M0-cod\\", it, 
+    "\\bias-abund-D3-E1-F2-M0-cod-")
+abundtrue <- readabund(filename = paste(casename,it,".csv",sep=""),
     type="True", istruecpue = TRUE)
 
-casename <- "bias-abund-D2341-E2341-F2-M0-cod-"
+casename <- paste0(rawoutputdir, "\\D3-E1-F2-M0-cod\\", it, 
+    "\\bias-abund-D3-E1-F2-M0-cod-")
 abundbias <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""), 
     type="Uncorrected")
 
-casename <- "cor-abund-D2341-E2341-F2-M0-cod-"
-abundcor <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""), 
+casename <- paste0(rawoutputdir, "\\D4-E1-F2-M0-cod\\", it, 
+    "\\cor-abund-D4-E1-F2-M0-cod-")
+abundcor <- readabund(filename = paste(casename,it,".csv",sep=""), 
     type="Corrected")
-    
-casename <- "samp-abund-D2341-E2341-F2-M0-cod-"
-abundsamp <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""), 
+
+casename <- paste0(rawoutputdir, "\\D2-E1-F2-M0-cod\\", it, 
+    "\\samp-abund-D2-E1-F2-M0-cod-")    
+abundsamp <- readabund(filename = paste(casename,it,".csv",sep=""), 
     type="Randomly sampled")
     
 tempabundout <- rbind(abundtrue, abundbias, abundcor, abundsamp)
