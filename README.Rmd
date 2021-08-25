@@ -221,7 +221,7 @@ p <- ggplot(test.05, aes(x = year)) + xlab("Year") +
 print(p)
 ```
 
-![Spawning biomass output example](https://raw.github.com/allen-chen-noaa/ss3simfork/master/inst/extdata/econ/SB_081821_mortup4.png)
+![Spawning biomass output example](https://raw.githubusercontent.com/allen-chen-noaa-gov/ss3simfork/master/inst/extdata/econ/SB_081821_mortup4.png)
 
 We can also look at the relative abundance indices across different sampling 
 patterns.
@@ -305,7 +305,7 @@ lineout = ggplot(data = linegraph,
 print(lineout)
 ```
 
-![Abundance indices output example](https://raw.github.com/allen-chen-noaa/ss3simfork/master/inst/extdata/econ/abundline_081821_mortup4.png)
+![Abundance indices output example](https://raw.githubusercontent.com/allen-chen-noaa-gov/ss3simfork/master/inst/extdata/econ/abundline_081821_mortup4.png)
 
 ## Next steps
 
