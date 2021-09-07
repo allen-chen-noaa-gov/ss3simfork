@@ -41,8 +41,8 @@ install("barebones.FishSET")
 install("ss3simfork")
 ```
 
-The first three packages run the model, and the latter two are just for making 
-the plots.
+The first three packages run the model, and the latter three are just for 
+making the plots.
 
 ```{r, eval=FALSE}
 #for running the model
@@ -172,7 +172,8 @@ get_results_all(directory = rawoutputdir,
 scalar_dat <- read.csv("ss3sim_scalar.csv")
 ts_dat <- read.csv("ss3sim_ts.csv")
 
-ts_dat$SpawnBio <- (SpawnBio_em - SpawnBio_om)/SpawnBio_om)
+ts_dat$SpawnBio <- (ts_dat$SpawnBio_em - ts_dat$SpawnBio_om)/
+    (ts_dat$SpawnBio_om)
   
 ts_dat <- merge(ts_dat, scalar_dat[,c("scenario", "replicate",
     "max_grad")])
@@ -194,16 +195,16 @@ ts_dat_sto$D <- revalue(ts_dat_sto$D, c(
 #Larger values (greater than 1) indicate that model convergence is unlikely. 
 ts_dat_sto <- ts_dat_sto[ts_dat_sto$max_grad<1,] 
 
-test.50 <- ddply(ts_dat_sto, .(E,year), summarise, 
+test.50 <- ddply(ts_dat_sto, .(D,year), summarise, 
     five0 = quantile(SpawnBio, probs = c(0.5), na.rm = TRUE))
 
-test.05 <- ddply(ts_dat_sto, .(E,year), summarise, 
+test.05 <- ddply(ts_dat_sto, .(D,year), summarise, 
     zero5 = quantile(SpawnBio, probs = c(0.025), na.rm = TRUE))
-test.95 <- ddply(ts_dat_sto, .(E,year), summarise, 
+test.95 <- ddply(ts_dat_sto, .(D,year), summarise, 
     nine5 = quantile(SpawnBio, probs = c(0.975), na.rm = TRUE))
-test.25 <- ddply(ts_dat_sto, .(E,year), summarise, 
+test.25 <- ddply(ts_dat_sto, .(D,year), summarise, 
     two5 = quantile(SpawnBio, probs = c(0.25), na.rm = TRUE))
-test.75 <- ddply(ts_dat_sto, .(E,year), summarise, 
+test.75 <- ddply(ts_dat_sto, .(D,year), summarise, 
     seven5 = quantile(SpawnBio, probs = c(0.75), na.rm = TRUE))    
 test.05$nine5 <- test.95$nine5
 test.05$two5 <- test.25$two5
@@ -243,7 +244,7 @@ abundtrue <- readabund(filename = paste(casename,it,".csv",sep=""),
 
 casename <- paste0(rawoutputdir, "\\D3-E1-F2-M0-cod\\", it, 
     "\\bias-abund-D3-E1-F2-M0-cod-")
-abundbias <- readabund(filename = paste(abunddir,casename,it,".csv",sep=""), 
+abundbias <- readabund(filename = paste(casename,it,".csv",sep=""), 
     type="Uncorrected")
 
 casename <- paste0(rawoutputdir, "\\D4-E1-F2-M0-cod\\", it, 

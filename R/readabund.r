@@ -10,7 +10,7 @@ tempabund$Index <- type
 if (istruecpue == TRUE) {
 names(tempabund)[names(tempabund) == "TrueCPUE"] <- "CPUE"
 } else {
-names(tempabund)[names(tempabund) == "DahlCPUE"] <- "CPUE"
+names(tempabund)[names(tempabund) == "EstCPUE"] <- "CPUE"
 }
 
 tempabund$RelDiff <- tempabund$CPUE/(tempabund$CPUE[1])
