@@ -43,8 +43,7 @@ if (file.exists(abundfile) == FALSE) {
 newabund <- list()
 for (i in 1:length(scalecatch)) { 
 
-library(barebones.FishSET)
-
+set.seed(i)
 betavarin <- as.matrix(betavar)*scalecatch[i]
 kk <- dim(locnum)[1]
 
@@ -106,8 +105,8 @@ changevec <- unname(c(1, rep(0, length(betavarin)),
 }
 
 results <- barebones.FishSET::explore_startparams(searchspace, initparams, dev = 2, 
-    logit_correction_polyint, otherdatfin$catchfin, otherdatfin$choicefin, 
-    otherdatfin$distance, otherdatfin,
+    logit_correction_polyint_estscale, otherdatfin$catchfin, 
+    otherdatfin$choicefin, otherdatfin$distance, otherdatfin,
     changevec)
 
 LLmat <- data.frame(cbind(1:searchspace,unlist(results$saveLLstarts)))

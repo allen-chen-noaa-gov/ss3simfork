@@ -38,6 +38,7 @@ if (is.null(filename) == TRUE) {
 
 newabund <- list()
 for (i in 1:length(scalecatch)) { 
+set.seed(i)
 
 betavarin <- as.matrix(betavar)*scalecatch[i]
 
