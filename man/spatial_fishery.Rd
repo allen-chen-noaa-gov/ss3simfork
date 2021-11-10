@@ -4,7 +4,16 @@
 \alias{spatial_fishery}
 \title{spatial_fishery}
 \usage{
-spatial_fishery(locnum, obsnum, betavar, uparams)
+spatial_fishery(
+  locnum,
+  obsnum,
+  betavar,
+  uparams,
+  totcatches,
+  year,
+  random = FALSE,
+  avghauls
+)
 }
 \arguments{
 \item{locnum}{description}

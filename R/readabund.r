@@ -1,3 +1,11 @@
+#' readabund
+#'
+#'
+#' @param filename description
+#' @param type description
+#'
+#' @export
+
 readabund <- function(filename, type, istruecpue = FALSE) {
 
 abunddat <- read.csv(filename)

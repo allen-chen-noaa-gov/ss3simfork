@@ -11,11 +11,11 @@ moredatasample <- function(datfile.origsave,dat_list,locnum,obsnum,betavar,
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
 						fleets          = 2,
-						years           = list(74:100),
+						years           = list((100-list(...)$obsyears):100),
 						sds_obs         = list(0.2),
 						write_file      = FALSE)
                         
-realcpue <- (datfile.origsave$CPUE[74:100,])
+realcpue <- (datfile.origsave$CPUE[(100-list(...)$obsyears):100,])
 
 if (is.null(abundscale) == TRUE) {
     scaleq <- mean(realcpue$obs)/sum(betavar)
@@ -49,52 +49,13 @@ distance <- locnum
 
 kk <- dim(distance)[1]
 
-if (length(obsnum) == 1) {
-    ii <- rep(obsnum, kk)
-} else {
-    ii <- obsnum
-}
+otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams,
+    datfile.origsave$catch[(100-list(...)$obsyears):100,],year=i,random=TRUE,
+    list(...)$avghauls)
 
-si <- list()
-zi <- list()
-for (l in 1:kk) {
-si[[l]] <- matrix(sample(1:5,ii[l]*1,replace=TRUE),ii[l],1)
-zi[[l]] <- matrix(sample(1:10,ii[l]*1,replace=TRUE),ii[l],1)
-}
-
-bik <- list()	
-for (l in 1:kk) { #can vectorize?
-bik[[l]] <- matrix(rnorm(ii[l]*kk,0,3),ii[l],kk)
-}
-
-choice <- list()
-yikchosen <- list()
-siout <- list()
-for (j in 1:kk) {
-
-yik <- list()
-
-for (k in 1:kk) {
-
-###################################Here for catch error
-yik[[k]] <- betavarin[k,]*si[[j]] + bik[[j]][,k]
-
-}
-
-choice[[j]] <- matrix(as.numeric(sample(1:kk,ii[j]*1,replace=TRUE),ii[j],1))
-yikchosen[[j]] <- as.matrix(diag(matrix(unlist(yik),ii[j],kk)[,choice[[j]]]))
-
-siout[[j]] <- si[[j]]
-
-}
-
-sifin <- data.frame(V1 = as.numeric(unlist(siout)),
-    V2 = as.numeric(unlist(siout)), V3 = as.numeric(unlist(siout)),
-    V4 = as.numeric(unlist(siout)))
-sifin <- matrix(as.numeric(unlist(siout)),sum(ii),kk)
-
-catchfin <- data.frame(V1 = unlist(yikchosen))
-choicefin <- data.frame(V1 = unlist(choice))
+choicefin <- otherdatfin$choicefin
+sifin <- do.call(cbind,otherdatfin$griddat)
+catchfin <- otherdatfin$catchfin
 
 XX <- model.matrix(~as.factor(V1)-1, choicefin)*sifin
 YY <- catchfin$V1
@@ -129,7 +90,8 @@ if (is.null(abundse) == TRUE) {
     dattemp$CPUE$se_log <- abundse
 }
 
-dat_list$CPUE <- rbind(dat_list$CPUE, dattemp$CPUE)
+dat_list$CPUE <- rbind(dat_list$CPUE, 
+    dattemp$CPUE[is.na(dattemp$CPUE$obs)==FALSE,])
 
 rownames(dat_list$CPUE) <- seq(length=nrow(dat_list$CPUE))
 

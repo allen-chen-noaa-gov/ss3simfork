@@ -11,11 +11,11 @@ moredatabias <- function(datfile.origsave,dat_list,locnum,obsnum,betavar,
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
 						fleets          = 2,
-						years           = list(74:100),
+						years           = list((100-list(...)$obsyears):100),
 						sds_obs         = list(0.2),
 						write_file      = FALSE)
 
-realcpue <- (datfile.origsave$CPUE[74:100,])
+realcpue <- (datfile.origsave$CPUE[(100-list(...)$obsyears):100,])
 
 if (is.null(abundscale) == TRUE) {
     scaleq <- mean(realcpue$obs)/sum(betavar)
@@ -41,7 +41,9 @@ set.seed(i)
 betavarin <- as.matrix(betavar)*scalecatch[i]
 kk <- dim(locnum)[1]
 
-otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams)
+otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams,
+    datfile.origsave$catch[(100-list(...)$obsyears):100,],year=i,random=FALSE,
+    list(...)$avghauls)
 
 choicefin <- otherdatfin$choicefin
 sifin <- do.call(cbind,otherdatfin$griddat)
@@ -80,7 +82,8 @@ if (is.null(abundse) == TRUE) {
     dattemp$CPUE$se_log <- abundse
 }
 
-dat_list$CPUE <- rbind(dat_list$CPUE, dattemp$CPUE)
+dat_list$CPUE <- rbind(dat_list$CPUE, 
+    dattemp$CPUE[is.na(dattemp$CPUE$obs)==FALSE,])
 
 rownames(dat_list$CPUE) <- seq(length=nrow(dat_list$CPUE))
 

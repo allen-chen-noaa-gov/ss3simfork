@@ -6,7 +6,8 @@
 #'
 #' @export
 
-spatial_fishery <- function(locnum,obsnum,betavar,uparams){
+spatial_fishery <- function(locnum,obsnum,betavar,uparams,totcatches,year,
+    random=FALSE,avghauls){
 
 alpha <- uparams$alpha
 betac <- uparams$betac
@@ -21,6 +22,7 @@ betac <- uparams$betac
 			# t(as.matrix(c(0.707, 0.5, 0.5, 0))))
 # distance <- distance*3
 
+betavar <- betavar
 distance <- locnum
 
 # kk <- 4
@@ -33,71 +35,81 @@ if (length(obsnum) == 1) {
     ii <- obsnum
 }
 
-si <- list()
-zi <- list()
-for (l in 1:kk) {
-si[[l]] <- matrix(sample(1:5,ii[l]*1,replace=TRUE),ii[l],1)
-zi[[l]] <- matrix(sample(1:10,ii[l]*1,replace=TRUE),ii[l],1)
-}
+ii <- ii/sum(ii)
 
-bik <- list()	
-for (l in 1:kk) { #can vectorize?
-bik[[l]] <- matrix(rnorm(ii[l]*kk,0,3),ii[l],kk)
-}
-
-wijk <- list()
-for (l in 1:kk) { 
-wijk[[l]] <- matrix((-log(rexp(ii[l]*kk,1))),ii[l],kk) 
-#-log(exp(1)) is standard type 1 extreme value i.e. gumbel beta=1 mu=0
-}
-
-choice <- list()
 yikchosen <- list()
+choice <- list()
 siout <- list()
-siout2 <- list()
 ziout <- list()
-ziout2 <- list()
 startlocout <- list()
 distanceout <- list()
-predyik <- list()
-predyik2 <- list()
-for (j in 1:kk) {
+triplength <- list()
+counter <- 1
+haulcounter <- 1
+#this is calibrated for about 1500 hauls in a year
+while (sum(unlist(yikchosen))*(30000) < 
+    totcatches$Fishery[year]) {
 
-Vijk <- list()
+si <- sample(1:5,1)
+zi <- sample(1:10,1)
+
+bik <- rnorm(kk,0,3)
+
+wijk <- -log(rexp(kk,1))
+#-log(exp(1)) is standard type 1 extreme value i.e. gumbel beta=1 mu=0
+
+if (haulcounter == 1) {
+j <- sample(1:kk, size = 1, prob = ii)
+}
+
 yik <- list()
-
+Vijk <- list()
 for (k in 1:kk) {
 
 ###################################Here for multiple params
-tijk <- betac*distance[j,k]*zi[[j]] + wijk[[j]][,k]
+tijk <- betac*distance[j,k]*zi + wijk[k]
 
 ###################################Here for catch error
-yik[[k]] <- betavar[k,]*si[[j]] + bik[[j]][,k]
+yik[[k]] <- betavar[k,]*si + bik[k]
 
 ###################################Here for multiple params
 Vijk[[k]] <- alpha*yik[[k]] + tijk
 
 }
 
-choice[[j]] <- as.matrix(which(t(apply(matrix(unlist(Vijk),ii[j],kk),1,max) == 
-    matrix(unlist(Vijk),ii[j],kk)))-(((1:ii[j])-1)*kk))
-yikchosen[[j]] <- as.matrix(diag(matrix(unlist(yik),ii[j],kk)[,choice[[j]]]))
+if (random == TRUE) {
+choice[[counter]] <- sample(1:kk,1)
+} else {
+choice[[counter]] <- which(max(unlist(Vijk)) == Vijk)
+}
 
-siout[[j]] <- si[[j]]
-ziout[[j]] <- zi[[j]]
-startlocout[[j]] <- rep(j,ii[j])
+yikchosen[[counter]] <- yik[[choice[[counter]]]]
 
-distanceout[[j]] <- t(matrix(rep(distance[j,],ii[j]),kk,ii[j]))
+siout[[counter]] <- si
+ziout[[counter]] <- zi
+startlocout[[counter]] <- j
+
+distanceout[[counter]] <- distance[j,]
+
+if (rpois(1, haulcounter) >= avghauls) {
+triplength[[counter]] <- haulcounter
+haulcounter <- 1 
+} else {
+j <- choice[[counter]]
+haulcounter <- haulcounter + 1
+}
+
+counter <- counter+1
 
 }
 
 zifin <- data.frame(V1 = as.numeric(unlist(ziout)))
 startlocfin <- data.frame(V1 = as.numeric(unlist(startlocout)))
 
-sifin <- data.frame(V1 = as.numeric(unlist(siout)), 
-    V2 = as.numeric(unlist(siout)), V3 = as.numeric(unlist(siout)), 
-    V4 = as.numeric(unlist(siout)))
-sifin <- matrix(as.numeric(unlist(siout)),sum(ii),kk)
+# sifin <- data.frame(V1 = as.numeric(unlist(siout)), 
+    # V2 = as.numeric(unlist(siout)), V3 = as.numeric(unlist(siout)), 
+    # V4 = as.numeric(unlist(siout)))
+sifin <- matrix(as.numeric(unlist(siout)), length(unlist(siout)),kk)
 
 catchfin <- data.frame(V1 = unlist(yikchosen))
 choicefin <- data.frame(V1 = unlist(choice))
