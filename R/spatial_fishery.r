@@ -46,8 +46,8 @@ distanceout <- list()
 triplength <- list()
 counter <- 1
 haulcounter <- 1
-#this is calibrated for about 1500 hauls in a year
-while (sum(unlist(yikchosen))*(30000) < 
+#this is calibrated for about 3000 hauls in a year
+while (sum(unlist(yikchosen))*(10000) < 
     totcatches$Fishery[year]) {
 
 si <- sample(1:5,1)
@@ -116,7 +116,7 @@ choicefin <- data.frame(V1 = unlist(choice))
 
 distancefin <- data.frame(do.call(rbind,distanceout))
 colnames(distancefin) <- c("V1","V2","V3","V4")
-				
+
 ###################################Here for multiple params
 
 intdatfin <- list(zi=zifin)

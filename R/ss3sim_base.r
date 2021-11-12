@@ -483,7 +483,8 @@ dat_listin <- dat_list
 dat_list <- functionnamein(datfile.origsave,dat_listin,
     econ_params$locnum, econ_params$obsnum, econ_params$betavar, 
     econ_params$uparams, econ_params$abundse, econ_params$abundscale,
-    econ_params$filename, obsyears = 12, avghauls = econ_params$avghauls)
+    econ_params$filename, obsyears = econ_params$obsyears, 
+	avghauls = econ_params$avghauls)
 
 # dat_list <- sample_econ(functionnamein,datfile.origsave,dat_listin,
     # econ_params$locnum, econ_params$obsnum, econ_params$betavar, 

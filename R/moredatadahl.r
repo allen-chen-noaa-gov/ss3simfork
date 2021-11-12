@@ -41,6 +41,8 @@ if (is.null(filename) == TRUE) {
 if (file.exists(abundfile) == FALSE) {
     
 newabund <- list()
+choiceout <- list()
+startout <- list()
 for (i in 1:length(scalecatch)) { 
 
 set.seed(i)
@@ -134,7 +136,8 @@ if (is.numeric(results_savev$OutLogit[2:(kk+1),1]) == FALSE ||
 } else {
     newabund[i] <- sum(results_savev$OutLogit[2:(kk+1),1])*scaleq
 }
-
+choiceout[[i]] <- table(otherdatfin$choicefin)
+startout[[i]] <- table(otherdatfin$startloc)
 }
 
 dattemp$CPUE$obs <- unlist(newabund)
@@ -153,6 +156,10 @@ abundout$diffperc = (abundout$TrueCPUE - abundout$EstCPUE)/abundout$TrueCPUE
 abundout <- abundout[order(abundout$year),]
 
 write.table(abundout, file=abundfile, sep=",", row.names=FALSE, quote = FALSE)
+write.table(cbind(do.call(rbind, startout), do.call(rbind, choiceout)), 
+	file=paste0(getwd(), "/", abundtitle, "/sampout-", 
+	gsub("/", "-", abundtitle), ".csv"), 
+	sep=",", row.names=FALSE, quote = FALSE)
 
 } else {
 
