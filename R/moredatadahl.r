@@ -11,7 +11,7 @@
 #' @export
 
 moredatadahl <- function(datfile.origsave,dat_list,locnum,obsnum,betavar,
-    uparams,abundse=NULL,abundscale=NULL,filename=NULL,...){
+    uparams,abundse=NULL,catchscale=NULL,filename=NULL,...){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
 						fleets          = 2,
@@ -21,13 +21,11 @@ dattemp <- sample_index(dat_list        = datfile.origsave,
 
 realcpue <- (datfile.origsave$CPUE[(100-list(...)$obsyears):100,])
 
-if (is.null(abundscale) == TRUE) {
-    scaleq <- mean(realcpue$obs)/sum(betavar)
-} else {
-    scaleq <- abundscale
+if (is.null(catchscale) == TRUE) {
+    catchscale <- min(datfile.origsave$catch[(100-list(...)$obsyears):100,])/1000
 }
 
-scalecatch <- realcpue$obs/mean(realcpue$obs)
+scaleabund <- realcpue$obs/mean(realcpue$obs)
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 
@@ -43,15 +41,14 @@ if (file.exists(abundfile) == FALSE) {
 newabund <- list()
 choiceout <- list()
 startout <- list()
-for (i in 1:length(scalecatch)) { 
+for (i in 1:length(scaleabund)) { 
 
-set.seed(i)
-betavarin <- as.matrix(betavar)*scalecatch[i]
+betavarin <- as.matrix(betavar)*scaleabund[i]
 kk <- dim(locnum)[1]
 
 otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams,
     datfile.origsave$catch[(100-list(...)$obsyears):100,],year=i,random=FALSE,
-    list(...)$avghauls)
+    list(...)$avghauls,catchscale)
 
 polyn <- 3
 polyintnum <- 1
@@ -134,7 +131,7 @@ if (is.numeric(results_savev$OutLogit[2:(kk+1),1]) == FALSE ||
     any(is.na(as.numeric(results_savev$OutLogit[,2]))) == TRUE) {
     newabund[i] <- NA
 } else {
-    newabund[i] <- sum(results_savev$OutLogit[2:(kk+1),1])*scaleq
+    newabund[i] <- sum(results_savev$OutLogit[2:(kk+1),1])*catchscale
 }
 choiceout[[i]] <- table(otherdatfin$choicefin)
 startout[[i]] <- table(otherdatfin$startloc)

@@ -7,7 +7,7 @@
 #' @export
 
 moredatabias <- function(datfile.origsave,dat_list,locnum,obsnum,betavar,
-    uparams,abundse=NULL,abundscale=NULL,filename=NULL,...){
+    uparams,abundse=NULL,catchscale=NULL,filename=NULL,...){
 dattemp <- sample_index(dat_list        = datfile.origsave,
 						outfile         = NULL,
 						fleets          = 2,
@@ -17,13 +17,11 @@ dattemp <- sample_index(dat_list        = datfile.origsave,
 
 realcpue <- (datfile.origsave$CPUE[(100-list(...)$obsyears):100,])
 
-if (is.null(abundscale) == TRUE) {
-    scaleq <- mean(realcpue$obs)/sum(betavar)
-} else {
-    scaleq <- abundscale
+if (is.null(catchscale) == TRUE) {
+    catchscale <- min(datfile.origsave$catch[(100-list(...)$obsyears):100,])/1000
 }
 
-scalecatch <- realcpue$obs/mean(realcpue$obs)
+scaleabund <- realcpue$obs/mean(realcpue$obs)
 
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 
@@ -35,15 +33,14 @@ if (is.null(filename) == TRUE) {
 }
 
 newabund <- list()
-for (i in 1:length(scalecatch)) { 
-set.seed(i)
+for (i in 1:length(scaleabund)) { 
 
-betavarin <- as.matrix(betavar)*scalecatch[i]
+betavarin <- as.matrix(betavar)*scaleabund[i]
 kk <- dim(locnum)[1]
 
 otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams,
     datfile.origsave$catch[(100-list(...)$obsyears):100,],year=i,random=FALSE,
-    list(...)$avghauls)
+    list(...)$avghauls,catchscale)
 
 choicefin <- otherdatfin$choicefin
 sifin <- do.call(cbind,otherdatfin$griddat)
@@ -54,7 +51,7 @@ YY <- catchfin$V1
 
 results_savev <- lm(YY~XX-1)
 
-newabund[i] <- sum(results_savev$coef)*scaleq
+newabund[i] <- sum(results_savev$coef)*catchscale
 
 }
 

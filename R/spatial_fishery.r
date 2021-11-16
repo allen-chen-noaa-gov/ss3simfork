@@ -7,7 +7,7 @@
 #' @export
 
 spatial_fishery <- function(locnum,obsnum,betavar,uparams,totcatches,year,
-    random=FALSE,avghauls){
+    random=FALSE,avghauls,catchscale){
 
 alpha <- uparams$alpha
 betac <- uparams$betac
@@ -47,7 +47,7 @@ triplength <- list()
 counter <- 1
 haulcounter <- 1
 #this is calibrated for about 3000 hauls in a year
-while (sum(unlist(yikchosen))*(10000) < 
+while (sum(unlist(yikchosen))*(catchscale) < 
     totcatches$Fishery[year]) {
 
 si <- sample(1:5,1)
