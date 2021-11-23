@@ -41,6 +41,8 @@ if (file.exists(abundfile) == FALSE) {
 newabund <- list()
 choiceout <- list()
 startout <- list()
+paramsout <- list()
+trueout <- list()
 for (i in 1:length(scaleabund)) { 
 
 betavarin <- as.matrix(betavar)*scaleabund[i]
@@ -133,6 +135,8 @@ if (is.numeric(results_savev$OutLogit[2:(kk+1),1]) == FALSE ||
 } else {
     newabund[i] <- sum(results_savev$OutLogit[2:(kk+1),1])*catchscale
 }
+paramsout[[i]] <-  results_savev$OutLogit[2:(kk+1),1]
+trueout[[i]] <- t(betavarin)
 choiceout[[i]] <- table(otherdatfin$choicefin)
 startout[[i]] <- table(otherdatfin$startloc)
 }
@@ -157,7 +161,11 @@ write.table(cbind(do.call(rbind, startout), do.call(rbind, choiceout)),
 	file=paste0(getwd(), "/", abundtitle, "/sampout-", 
 	gsub("/", "-", abundtitle), ".csv"), 
 	sep=",", row.names=FALSE, quote = FALSE)
-
+write.table(cbind(do.call(rbind, trueout), do.call(rbind, paramsout)), 
+	file=paste0(getwd(), "/", abundtitle, "/paramsout-", 
+	gsub("/", "-", abundtitle), ".csv"), 
+	sep=",", row.names=FALSE, quote = FALSE)
+    
 } else {
 
 abundout <- read.table(abundfile, sep=",", header=TRUE)

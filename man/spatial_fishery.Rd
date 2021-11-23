@@ -12,7 +12,8 @@ spatial_fishery(
   totcatches,
   year,
   random = FALSE,
-  avghauls
+  avghauls,
+  catchscale
 )
 }
 \arguments{

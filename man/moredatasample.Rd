@@ -12,7 +12,7 @@ moredatasample(
   betavar,
   uparams,
   abundse = NULL,
-  abundscale = NULL,
+  catchscale = NULL,
   filename = NULL,
   ...
 )
