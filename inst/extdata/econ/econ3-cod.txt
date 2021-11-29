@@ -1,0 +1,10 @@
+functionname; moredatabias
+locnum; as.matrix(dist(matrix(c(0,0,1,0,2,0,0,1,1,1,2,1,0,2,1,2,2,2), nrow = 9, ncol=2, byrow=TRUE),upper=TRUE,diag=TRUE))*(3/4)
+obsnum; rep(1,9)
+betavar; seq(0.75, 1.50, (1.50-0.75)/8)
+uparams; list(alpha = 3, betac = -1)
+abundse; NULL
+catchscale; 10000
+filename; NULL
+avghauls; 0
+obsyears; 12

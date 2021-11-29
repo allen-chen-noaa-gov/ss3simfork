@@ -117,7 +117,7 @@ LLmatorder <- LLmat[order(LLmat$X2),]
 initparamssave <- results$savestarts[LLmatorder$X1[1:100]]
 
 while ((any(is.na(as.numeric(results_savev$OutLogit[,2]))) == TRUE ||
-    results_savev$OutLogit[1,1] < 0) & initcount < 20) {
+    results_savev$OutLogit[1,1] < 0) & initcount < 10) {
 
 initcount <- initcount + 1
     
