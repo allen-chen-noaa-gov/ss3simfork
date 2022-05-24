@@ -45,18 +45,28 @@ paramsout <- list()
 trueout <- list()
 for (i in 1:length(scaleabund)) { 
 
-betavarin <- as.matrix(betavar)*scaleabund[i]
-kk <- dim(locnum)[1]
+betavarscaled <- (betavar/sum(betavar))*10.125
+
+if (list(...)$trend==TRUE) {
+slope <- (max(betavar)-min(betavar))/list(...)$obsyears
+slopesign <- sign(betavar[1]-betavar[length(betavar)])
+betaslope <- seq((-slopesign)*slope, slopesign*slope,by=(
+    slopesign*(2*slope)/(length(betavar)-1)))
+betavarscaled <- ((betavar/sum(betavar))*10.125)+(betaslope*i)  
+}
+
+betavarin <- as.matrix(betavarscaled)*scaleabund[i]
 
 otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams,
     datfile.origsave$catch[(100-list(...)$obsyears):100,],year=i,random=FALSE,
     list(...)$avghauls,catchscale)
+otherdatfinsave <- otherdatfin
 
-polyn <- 3
+polyn <- 2
 polyintnum <- 1
 regconstant <- 0
 polyconstant <- 1
-singlecor <- 0
+singlecor <- 1
 
 otherdatfin$polyn <- polyn
 otherdatfin$polyintnum <- polyintnum
@@ -65,13 +75,37 @@ otherdatfin$polyconstant <- polyconstant
 otherdatfin$singlecor <- singlecor
 zifin <- do.call(cbind,otherdatfin$intdat)
 
+# for not estimating areas far away with few observations
+while(all(table(otherdatfin$choicefin)>=list(...)$minobs) == FALSE) {
+set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
+    table(otherdatfin$choicefin) >= list(...)$minobs])))
+rowset <- !((!(otherdatfin$choicefin$V1 %in% set)) | 
+    (!(otherdatfin$startloc %in% set)))
+    
+otherdatfin$startloc <- as.matrix(otherdatfin$startloc[rowset, ])
+otherdatfin$choicefin <- data.frame(V1 = otherdatfin$choicefin[rowset, ])
+otherdatfin$catchfin <- data.frame(V1 = otherdatfin$catchfin[rowset, ])
+otherdatfin$distance <- otherdatfin$distance[rowset, ]
+otherdatfin$distance <- otherdatfin$distance[, set]
+otherdatfin$intdat[[1]] <- as.matrix(otherdatfin$intdat[[1]][rowset, ])
+otherdatfin$griddat[[1]] <- otherdatfin$griddat[[1]][rowset, ]
+otherdatfin$griddat[[1]] <- otherdatfin$griddat[[1]][, set]
+}
+
+otherdatfin$choicefin$V1 <- as.factor(otherdatfin$choicefin$V1)
+levels(otherdatfin$choicefin$V1) <- 
+    1:length(unique(levels(as.factor(otherdatfin$choicefin$V1))))
+otherdatfin$choicefin$V1 <- as.integer(otherdatfin$choicefin$V1)
+# end of areas far away
+
+kk <- length(betavarin[set])
 if (regconstant == 1) {
-    initparams <- unname(c(1, betavarin, rep(0, 
+    initparams <- unname(c(1, betavarin[set], rep(0, 
         (((polyn+polyconstant)*(1+(1-singlecor))) + polyintnum)*kk), 
         rep(-1,dim(zifin)[2]), 1))
     #Initial paramters for revenue then cost.
 } else {
-    initparams <- unname(c(1, betavarin, rep(0, 
+    initparams <- unname(c(1, betavarin[set], rep(0, 
         (((polyn+polyconstant)*(1+(1-singlecor))) + polyintnum)*kk), 
         rep(-1,dim(zifin)[2]), 1))
 }
@@ -96,12 +130,12 @@ initcount <- 0
 searchspace <- 1000
 
 if (regconstant == 1) {
-changevec <- unname(c(1, rep(0, length(betavarin)),
+changevec <- unname(c(1, rep(0, length(betavarin[set])),
     rep(1, (((polyn+polyconstant)*(1+(1-singlecor))) + polyintnum)*kk), 
     rep(1,dim(zifin)[2]), 1)) 
     # Initial paramters for revenue then cost.
 } else {
-changevec <- unname(c(1, rep(0, length(betavarin)),
+changevec <- unname(c(1, rep(0, length(betavarin[set])),
     rep(1, (((polyn+polyconstant)*(1+(1-singlecor))) + polyintnum)*kk), 
     rep(1,dim(zifin)[2]), 1)) 
 }
@@ -137,8 +171,8 @@ if (is.numeric(results_savev$OutLogit[2:(kk+1),1]) == FALSE ||
 }
 paramsout[[i]] <-  results_savev$OutLogit[2:(kk+1),1]
 trueout[[i]] <- t(betavarin)
-choiceout[[i]] <- table(otherdatfin$choicefin)
-startout[[i]] <- table(otherdatfin$startloc)
+choiceout[[i]] <- table(otherdatfinsave$choicefin)
+startout[[i]] <- table(otherdatfinsave$startloc)
 }
 
 dattemp$CPUE$obs <- unlist(newabund)
@@ -174,6 +208,8 @@ abundout <- abundout[order(abundout$year),]
 
 dattemp$CPUE$obs <- abundout$EstCPUE
 dattemp$CPUE$index <- 3
+dattemp$CPUE <- dattemp$CPUE[is.na(dattemp$CPUE$obs) == FALSE, ]
+
 
 }
 

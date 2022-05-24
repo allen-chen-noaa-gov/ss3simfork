@@ -34,10 +34,14 @@ if (is.null(filename) == TRUE) {
     ".csv")
 }
 
+if (file.exists(abundfile) == FALSE) {
+
 newabund <- list()
 for (i in 1:length(scaleabund)) { 
 
-betavarin <- as.matrix(betavar)*scaleabund[i]
+betavarscaled <- (betavar/sum(betavar))*10.125
+
+betavarin <- as.matrix(betavarscaled)*scaleabund[i]
 
 alpha <- uparams$alpha
 betac <- uparams$betac
@@ -79,6 +83,18 @@ abundout$diffperc = (abundout$TrueCPUE - abundout$EstCPUE)/abundout$TrueCPUE
 abundout <- abundout[order(abundout$year),]
 
 write.table(abundout, file=abundfile, sep=",", row.names=FALSE, quote = FALSE)
+
+} else {
+
+abundout <- read.table(abundfile, sep=",", header=TRUE)
+
+abundout <- abundout[order(abundout$year),]
+
+dattemp$CPUE$obs <- abundout$EstCPUE
+dattemp$CPUE$index <- 3
+dattemp$CPUE <- dattemp$CPUE[is.na(dattemp$CPUE$obs) == FALSE, ]
+
+}
 
 if (is.null(abundse) == TRUE) {
     dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/

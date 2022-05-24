@@ -109,7 +109,7 @@ startlocfin <- data.frame(V1 = as.numeric(unlist(startlocout)))
 # sifin <- data.frame(V1 = as.numeric(unlist(siout)), 
     # V2 = as.numeric(unlist(siout)), V3 = as.numeric(unlist(siout)), 
     # V4 = as.numeric(unlist(siout)))
-sifin <- matrix(as.numeric(unlist(siout)), length(unlist(siout)),kk)
+sifin <- matrix(as.numeric(unlist(siout)), length(unlist(siout)),max(unlist(choice)))
 
 catchfin <- data.frame(V1 = unlist(yikchosen))
 choicefin <- data.frame(V1 = unlist(choice))
