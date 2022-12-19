@@ -7,7 +7,7 @@
 #' @export
 
 spatial_fishery <- function(locnum,obsnum,betavar,uparams,totcatches,year,
-    random=FALSE,avghauls,catchscale){
+    random=FALSE,avghauls,catchscale,catchvarV,catchvarN){
 
 alpha <- uparams$alpha
 betac <- uparams$betac
@@ -53,7 +53,8 @@ while (sum(unlist(yikchosen))*(catchscale) <
 si <- sample(1:5,1)
 zi <- sample(1:10,1)
 
-bik <- rnorm(kk,0,3)
+bik <- rnorm(kk,0,catchvarV)
+bikN <- rnorm(kk,0,catchvarN)
 
 wijk <- -log(rexp(kk,1))
 #-log(exp(1)) is standard type 1 extreme value i.e. gumbel beta=1 mu=0
@@ -63,6 +64,7 @@ j <- sample(1:kk, size = 1, prob = ii)
 }
 
 yik <- list()
+yikT <- list()
 Vijk <- list()
 for (k in 1:kk) {
 
@@ -71,6 +73,7 @@ tijk <- betac*distance[j,k]*zi + wijk[k]
 
 ###################################Here for catch error
 yik[[k]] <- betavar[k,]*si + bik[k]
+yikT[[k]] <- yik[[k]] + bikN[k]
 
 ###################################Here for multiple params
 Vijk[[k]] <- alpha*yik[[k]] + tijk
@@ -83,7 +86,7 @@ choice[[counter]] <- sample(1:kk,1)
 choice[[counter]] <- which(max(unlist(Vijk)) == Vijk)
 }
 
-yikchosen[[counter]] <- yik[[choice[[counter]]]]
+yikchosen[[counter]] <- yikT[[choice[[counter]]]]
 
 siout[[counter]] <- si
 ziout[[counter]] <- zi

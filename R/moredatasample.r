@@ -26,33 +26,34 @@ scaleabund <- realcpue$obs/mean(realcpue$obs)
 abundtitle <- sub("/\\s*em\\b.*", "", dat_list$`sourcefile`)
 
 if (is.null(filename) == TRUE) {
-    abundfile <- paste0(getwd(), "/", abundtitle, "/samp-abund-", 
+    abundfile <- paste0(getwd(), "/", abundtitle, "/bias-abund-", 
         gsub("/", "-", abundtitle), ".csv")
 } else {
-    
-    abundfile <- paste0(filename, gsub("/", "-", gsub("^[^/]*/","",abundtitle)),
-    ".csv")
+    abundfile <- paste0(filename,  gsub(".*/","",abundtitle), ".csv")
 }
 
 if (file.exists(abundfile) == FALSE) {
 
 newabund <- list()
+newse <- list()
 for (i in 1:length(scaleabund)) { 
 
 betavarscaled <- (betavar/sum(betavar))*10.125
 
+if (list(...)$trend==TRUE) {
+slope <- (max(betavar)-min(betavar))/list(...)$obsyears
+slopesign <- sign(betavar[1]-betavar[length(betavar)])
+betaslope <- seq((-slopesign)*slope, slopesign*slope,by=(
+    slopesign*(2*slope)/(length(betavar)-1)))
+betavarscaled <- ((betavar/sum(betavar))*10.125)+(betaslope*i)  
+}
+
 betavarin <- as.matrix(betavarscaled)*scaleabund[i]
-
-alpha <- uparams$alpha
-betac <- uparams$betac
-
-distance <- locnum
-
-kk <- dim(distance)[1]
+kk <- dim(locnum)[1]
 
 otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams,
     datfile.origsave$catch[(100-list(...)$obsyears):100,],year=i,random=TRUE,
-    list(...)$avghauls,catchscale)
+    list(...)$avghauls,catchscale,list(...)$catchvarV,list(...)$catchvarN)
 
 choicefin <- otherdatfin$choicefin
 sifin <- do.call(cbind,otherdatfin$griddat)
@@ -63,12 +64,21 @@ YY <- catchfin$V1
 
 results_savev <- lm(YY~XX-1)
 
+fin <- c(catchscale)
+bstring <- paste0("~(", paste(paste("x", 1:(kk), sep=""), collapse="+"), 
+	")*(%f)")
+form <- do.call(sprintf, c(fmt = bstring, as.list(fin)))
+seout <- msm::deltamethod(as.formula(form), coef(results_savev), 
+    vcov(results_savev))
+
 newabund[i] <- sum(results_savev$coef)*catchscale
+newse[i] <- sqrt(log(1+(((seout)/(newabund[[i]]))^2)))
 
 }
 
 dattemp$CPUE$obs <- unlist(newabund)
-dattemp$CPUE[is.na(dattemp$CPUE$obs)==FALSE,]
+dattemp$CPUE$se_log <- unlist(newse)
+dattemp$CPUE <- dattemp$CPUE[is.na(dattemp$CPUE$obs) == FALSE, ]
 dattemp$CPUE$index <- 3
 
 abundout <- merge(realcpue, dattemp$CPUE,  by = c("year", "seas"))
@@ -90,18 +100,18 @@ abundout <- read.table(abundfile, sep=",", header=TRUE)
 
 abundout <- abundout[order(abundout$year),]
 
-dattemp$CPUE$obs <- abundout$EstCPUE
-dattemp$CPUE$index <- 3
-dattemp$CPUE <- dattemp$CPUE[is.na(dattemp$CPUE$obs) == FALSE, ]
+# dattemp$CPUE$obs <- abundout$EstCPUE
+# dattemp$CPUE$index <- 3
+# dattemp$CPUE <- dattemp$CPUE[is.na(dattemp$CPUE$obs) == FALSE, ]
 
 }
 
-if (is.null(abundse) == TRUE) {
-    dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/
-        mean(dattemp$CPUE$obs))^2)))
-} else {
-    dattemp$CPUE$se_log <- abundse
-}
+# if (is.null(abundse) == TRUE) {
+    # dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/
+        # mean(dattemp$CPUE$obs))^2)))
+# } else {
+    # dattemp$CPUE$se_log <- abundse
+# }
 
 dat_list$CPUE <- rbind(dat_list$CPUE, 
     dattemp$CPUE[is.na(dattemp$CPUE$obs)==FALSE,])

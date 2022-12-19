@@ -39,6 +39,7 @@ if (is.null(filename) == TRUE) {
 if (file.exists(abundfile) == FALSE) {
     
 newabund <- list()
+newse <- list()
 choiceout <- list()
 startout <- list()
 paramsout <- list()
@@ -59,7 +60,7 @@ betavarin <- as.matrix(betavarscaled)*scaleabund[i]
 
 otherdatfin <- spatial_fishery(locnum,obsnum,betavarin,uparams,
     datfile.origsave$catch[(100-list(...)$obsyears):100,],year=i,random=FALSE,
-    list(...)$avghauls,catchscale)
+    list(...)$avghauls,catchscale,list(...)$catchvarV,list(...)$catchvarN)
 otherdatfinsave <- otherdatfin
 
 polyn <- 2
@@ -76,6 +77,8 @@ otherdatfin$singlecor <- singlecor
 zifin <- do.call(cbind,otherdatfin$intdat)
 
 # for not estimating areas far away with few observations
+set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
+    table(otherdatfin$choicefin) >= list(...)$minobs])))
 while(all(table(otherdatfin$choicefin)>=list(...)$minobs) == FALSE) {
 set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
     table(otherdatfin$choicefin) >= list(...)$minobs])))
@@ -163,20 +166,30 @@ results_savev <- barebones.FishSET::discretefish_subroutine(otherdatfin$catchfin
 
 }
 
+fin <- c(catchscale)
+bstring <- paste0("~(", paste(paste("x", 2:(kk+1), sep=""), collapse="+"), 
+	")*(%f)")
+form <- do.call(sprintf, c(fmt = bstring, as.list(fin)))
+seout <- msm::deltamethod(as.formula(form), results_savev$OutLogit[,1], 
+	results_savev$H1)
+
 if (is.numeric(results_savev$OutLogit[2:(kk+1),1]) == FALSE ||
     any(is.na(as.numeric(results_savev$OutLogit[,2]))) == TRUE) {
     newabund[i] <- NA
+	newse[i] <- NA
 } else {
     newabund[i] <- sum(results_savev$OutLogit[2:(kk+1),1])*catchscale
+	newse[i] <- sqrt(log(1+(((seout)/(newabund[[i]]))^2)))
 }
 paramsout[[i]] <-  results_savev$OutLogit[2:(kk+1),1]
 trueout[[i]] <- t(betavarin)
-choiceout[[i]] <- table(otherdatfinsave$choicefin)
-startout[[i]] <- table(otherdatfinsave$startloc)
+choiceout[[i]] <- table(otherdatfin$choicefin)
+startout[[i]] <- table(otherdatfin$startloc)
 }
 
 dattemp$CPUE$obs <- unlist(newabund)
-dattemp$CPUE[is.na(dattemp$CPUE$obs)==FALSE,]
+dattemp$CPUE$se_log <- unlist(newse)
+dattemp$CPUE <- dattemp$CPUE[is.na(dattemp$CPUE$obs) == FALSE, ]
 dattemp$CPUE$index <- 3
 
 abundout <- merge(realcpue, dattemp$CPUE,  by = c("year", "seas"))
@@ -206,19 +219,19 @@ abundout <- read.table(abundfile, sep=",", header=TRUE)
 
 abundout <- abundout[order(abundout$year),]
 
-dattemp$CPUE$obs <- abundout$EstCPUE
-dattemp$CPUE$index <- 3
-dattemp$CPUE <- dattemp$CPUE[is.na(dattemp$CPUE$obs) == FALSE, ]
+# dattemp$CPUE$obs <- abundout$EstCPUE
+# dattemp$CPUE$index <- 3
+# dattemp$CPUE <- dattemp$CPUE[is.na(dattemp$CPUE$obs) == FALSE, ]
 
 
 }
 
-if (is.null(abundse) == TRUE) {
-    dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/
-        mean(dattemp$CPUE$obs))^2)))
-} else {
-    dattemp$CPUE$se_log <- abundse
-}
+# if (is.null(abundse) == TRUE) {
+    # dattemp$CPUE$se_log <- sqrt(log(1+((sd(dattemp$CPUE$obs)/
+        # mean(dattemp$CPUE$obs))^2)))
+# } else {
+    # dattemp$CPUE$se_log <- abundse
+# }
 
 dat_list$CPUE <- rbind(dat_list$CPUE, 
     dattemp$CPUE[is.na(dattemp$CPUE$obs)==FALSE,])

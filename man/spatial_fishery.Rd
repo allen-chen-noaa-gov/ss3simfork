@@ -13,7 +13,9 @@ spatial_fishery(
   year,
   random = FALSE,
   avghauls,
-  catchscale
+  catchscale,
+  catchvarV,
+  catchvarN
 )
 }
 \arguments{
