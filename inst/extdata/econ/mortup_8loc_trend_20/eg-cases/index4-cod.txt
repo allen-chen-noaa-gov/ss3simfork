@@ -1,0 +1,3 @@
+fleets; 2
+years; list(c(76, 80, 84, 88, 92, 96, 100))
+sds_obs; list(0.2)

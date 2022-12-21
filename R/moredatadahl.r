@@ -178,7 +178,8 @@ if (is.numeric(results_savev$OutLogit[2:(kk+1),1]) == FALSE ||
     newabund[i] <- NA
 	newse[i] <- NA
 } else {
-    newabund[i] <- sum(results_savev$OutLogit[2:(kk+1),1])*catchscale
+    newabund[i] <- mean(results_savev$OutLogit[2:(kk + 1), 1]) *
+      length(results_savev$OutLogit[2:(kk + 1), 1]) * catchscale
 	newse[i] <- sqrt(log(1+(((seout)/(newabund[[i]]))^2)))
 }
 paramsout[[i]] <-  results_savev$OutLogit[2:(kk+1),1]
