@@ -143,7 +143,7 @@ totabundout <- reshape(data = totabundtemp,
         direction = "long")
 
 linegraph <- aggregate(totabundout$RelDiff,
-    list(Year = totabundout$year, Index = totabundout$Index), mean, 
+    list(Year = totabundout$year, Index = totabundout$Index), mean,
     na.rm = TRUE)
 names(linegraph)[names(linegraph) == "x"] <- "RelDiff"
 
@@ -178,7 +178,7 @@ lineout <- ggplot(data = linegraph,
     geom_line(aes(colour = Index, group = Index), size = 1, position = pd) +
     geom_point(aes(shape = Index), size = 2, fill = "white", stroke = 0.75,
         position = pd) +
-    geom_ribbon(aes(x = Year, ymin = RelDiff - (2 * se), 
+    geom_ribbon(aes(x = Year, ymin = RelDiff - (2 * se),
         ymax = RelDiff + (2 * se),
         fill = Index, alpha = Index)) +
     xlab("Year") + ylab("Relative error in abundance") +

@@ -15,6 +15,9 @@ Please refer to the [ss3sim Github](https://github.com/ss3sim/ss3sim) for
 documentation and the original repository. This readme outlines changes to that 
 original repository.
 
+Please also scroll to the end of this readme for instructions on replication of 
+the paper "Economists Counting Fish".
+
 ## Where the economic model interacts with ss3sim
 
 The primary interaction the economic model has with ss3sim is to potentially 
@@ -77,8 +80,8 @@ case_folder <- paste0(nicedir, "\\eg-cases")
 
 The primary difference is that there is an extra "econ" case file in the
 eg-cases folder now. The example cases below can be found in the 
-inst\\extdata\\econ\\eg-cases folder in the package, to be copied into the 
-directory you chose above.
+`inst\\extdata\\econ\\eg-cases_readme` folder in the package, to be copied into 
+the directory you chose above.
 
 An example econ case file is shown below. The econ case file specifies the 
 economic model and sampling process in `functionname`. There are currently four 
@@ -143,6 +146,7 @@ print(Sys.time())
 
 endtime - begtime
 ```
+
 The operating model runs the same as before. Now, during the estimating model, 
 in `ss3sim_base`, there is an additional `sample_econ` call that runs the 
 function specified in the econ case file. As part of this process the 
@@ -316,32 +320,14 @@ print(lineout)
 
 ![Abundance indices output example](https://github.com/allen-chen-noaa-gov/ss3simfork/blob/master/inst/extdata/econ/abundline_081821_mortup4.png?raw=true)
 
-## Next steps
+## Economists Counting Fish
 
-The way the econ case files are set up there are a few places to expand the
-analysis in a fairly straightforward manner.  
+We also include the code to reproduce the results from the paper "Economists 
+Counting Fish". A script can be found in the `inst\\extdata\\econ\\` folder in 
+the package, titled `paper_script.r`. Note this script requires you to set a 
+directory to write the raw output into, as the raw output is expected to be a 
+few GB.
 
-1) Include more locations for robustness. This only involves editing the 
-distance matrix and betavar. Likely 9 or 12 locations as long as this seems 
-sufficient, because run time gets imposing (if one run of the economic model 
-takes one hour, but for each year, and each iteration, that's 2600 hours 
-divided by the number of workers avaiable).  
-
-2) Randomize or add a spatial trend to the betavar. Currently they're static. 
-We could randomize the locations so some locations have greater catches in some 
-years, but not others. Or, have fish moving northward during the time period. I 
-expect the economic model to still work fairly well actually, until we...  
-
-3) Change the number of chosen observations at locations. There are likely two 
-different ways to do so. The first is to just have some locations with very few 
-or no starting observations (a fisher starts in a location, then gets to choose 
-where to go). The `obsnum` variable in the econ case file can currently take a 
-vector of length equal to the number of locations. Or, we can also try and 
-change the fisher utility parameters to for example find travel very costly. 
-Then vessels may not travel to some locations (as long as none were seeded 
-there).  
-
-4) In general while doing these robustness checks, it would be good to get 
-input and think about what real-world fisheries these examples are most 
-relevant to. And, we can complicate the way catches are modeled, or abundance 
-is distributed spatially, if things seem too simplified.
+Then, the `make_fig5.r` script will reproduce Figure 5 from the paper, which 
+outlines the various relative abundance indices and errors. With 8 workers, it 
+should take about 2 weeks to run.
