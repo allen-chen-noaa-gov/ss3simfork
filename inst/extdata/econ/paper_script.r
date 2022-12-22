@@ -16,7 +16,8 @@ d <- system.file("extdata", package = "ss3simfork")
 om <- paste0(d, "/models/cod-om")
 em <- paste0(d, "/models/cod-em")
 
-# rawoutputdir for files (iterations and scenarios)
+# rawoutputdir for files (iterations and scenarios). make a folder for each
+# scenario
 # rawoutputdir <- paste0(ENTER YOUR DIRECTORY FOR OUTPUT HERE)
 
 dirsin <- c("mortup_9loc",
@@ -30,10 +31,17 @@ begtime <- Sys.time()
 for (i in 1:4) {
 
 # nicedir for cases
-nicedir <- paste0(d, "/econ/", dirsin[i], "/eg-cases")
+case_folder <- paste0(d, "/econ/", dirsin[i], "/eg-cases")
+
+if (file.exists(paste0(rawoutputdir, "/", dirsin[i]))) {
+  setwd(paste0(rawoutputdir, "/", dirsin[i]))
+} else {
+  dir.create(file.path(paste0(rawoutputdir, "/", dirsin[i])),
+    showWarnings = FALSE)
+  setwd(paste0(rawoutputdir, "/", dirsin[i]))
+}
 
 # This is directory where raw output gets written
-setwd(paste0(rawoutputdir, "/", dirsin[i]))
 
 # The current directory when you register parallel cores is the directory output
 # gets written

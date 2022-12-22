@@ -4,7 +4,7 @@ obsnum; c(1, rep(0,8))
 betavar; seq(0.75, 1.50, (1.50-0.75)/8)
 uparams; list(alpha = 3, betac = -1)
 abundse; NULL
-catchscale; 10000
+catchscale; 5000
 filename; NULL
 avghauls; 10
 obsyears; 12
