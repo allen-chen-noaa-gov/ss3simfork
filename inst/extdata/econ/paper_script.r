@@ -48,12 +48,12 @@ if (file.exists(paste0(rawoutputdir, "/", dirsin[i]))) {
 # registerDoParallel(cores = CHECK THE NUMBER OF WORKERS ON YOUR MACHINE)
 
 run_ss3sim(iterations = 1:200, scenarios =
-     c(
-    "D4-E1-F2-M0-cod",
-    "D1-E1-F2-M0-cod",
-    "D2-E1-F2-M0-cod",
-    "D3-E1-F2-M0-cod"
-     ),
+  c(
+  "D4-E1-F2-M0-cod",
+  "D1-E1-F2-M0-cod",
+  "D2-E1-F2-M0-cod",
+  "D3-E1-F2-M0-cod"
+  ),
   case_files = list(F = "F", D = c("index", "lcomp", "agecomp", "econ"),
     E = "E", M = "M"),
   case_folder = case_folder, om_dir = om,
