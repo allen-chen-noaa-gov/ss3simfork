@@ -475,27 +475,18 @@ ss3sim_base <- function(iterations, scenarios, f_params,
               write_file       = FALSE)
       }
 
-############################################################################################################
-############################################################################################################
-############################################################################################################
-functionnamein <- get(econ_params$functionname)
-dat_listin <- dat_list
-dat_list <- functionnamein(datfile.origsave,dat_listin,
-    econ_params$locnum, econ_params$obsnum, econ_params$betavar, 
-    econ_params$uparams, econ_params$abundse, econ_params$catchscale,
-    econ_params$filename, obsyears = econ_params$obsyears, 
-	avghauls = econ_params$avghauls, trend = econ_params$trend, 
-    minobs = econ_params$minobs, catchvarV = econ_params$catchvarV, 
-    catchvarN = econ_params$catchvarN)
+    # Could be a cleaner way to grab the sampling function? and to input the
+    # econ params?
+    functionnamein <- get(econ_params$functionname)
+    dat_listin <- dat_list
+    dat_list <- functionnamein(datfile.origsave, dat_listin,
+      econ_params$locnum, econ_params$obsnum, econ_params$betavar,
+      econ_params$uparams, econ_params$abundse, econ_params$catchscale,
+      econ_params$filename, obsyears = econ_params$obsyears,
+      avghauls = econ_params$avghauls, trend = econ_params$trend,
+      minobs = econ_params$minobs, catchvarV = econ_params$catchvarV,
+      catchvarN = econ_params$catchvarN)
 
-# dat_list <- sample_econ(functionnamein,datfile.origsave,dat_listin,
-    # econ_params$locnum, econ_params$obsnum, econ_params$betavar, 
-    # econ_params$uparams, econ_params$abundse, econ_params$abundscale,
-    # econ_params$filename)
-############################################################################################################
-############################################################################################################
-############################################################################################################
-	  
       # Manipulate EM control file to adjust what gets estimated
       # We'll only a portion of the function, the ctl part if
       # it's a bias run or if bias adjustment isn't getting run.

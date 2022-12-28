@@ -32,7 +32,7 @@ The files added or modified from the original fork should be:
 * /R/case_econ.r
 * /R/sample_econ.r
 * /R/spatial_fishery.r
-* /R/ss3sim_base.r
+* /R/ss3sim_base.r (line 478)
 
 ## Where the economic model interacts with ss3sim
 

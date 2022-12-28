@@ -10,4 +10,5 @@ case_econ <- function(functionname = NULL, case, spp) {
     mapply(write, file = filename, MoreArgs = list(ncolumns = 2,
       x = c("functionname;", functionname)))
   }
+
 }
