@@ -13,12 +13,22 @@ changes to that original repository.
 Please also scroll to the end of this readme for instructions on
 replication of the paper “Economists Counting Fish”.
 
-The files added or modified from the original fork should be: \*
-/README.Rmd \* /inst/extdata/econ + /inst/extdata/econ/paper_script.r +
-/inst/extdata/econ/make_fig5.r + … \* /R/moredatabias.r \*
-/R/moredatadahl.r \* /R/moredatasample.r \* /R/no_data.r \*
-/R/readabund.r \* /R/case_econ.r \* /R/sample_econ.r \*
-/R/spatial_fishery.r \* /R/ss3sim_base.r (line 478)
+The files added or modified from the original fork should be:
+
+-   /README.Rmd
+-   /inst/extdata/econ
+    -   /inst/extdata/econ/paper_script.r
+    -   /inst/extdata/econ/make_fig5.r
+    -   …
+-   /R/moredatabias.r
+-   /R/moredatadahl.r
+-   /R/moredatasample.r
+-   /R/no_data.r
+-   /R/readabund.r
+-   /R/case_econ.r
+-   /R/sample_econ.r
+-   /R/spatial_fishery.r
+-   /R/ss3sim_base.r (line 478)
 
 ## Where the economic model interacts with ss3sim
 

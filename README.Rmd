@@ -19,6 +19,7 @@ Please also scroll to the end of this readme for instructions on replication of
 the paper "Economists Counting Fish".
 
 The files added or modified from the original fork should be:
+
 * /README.Rmd
 * /inst/extdata/econ
   + /inst/extdata/econ/paper_script.r
