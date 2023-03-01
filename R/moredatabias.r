@@ -97,8 +97,7 @@ form <- do.call(sprintf, c(fmt = bstring, as.list(fin)))
 seout <- msm::deltamethod(as.formula(form), coef(results_savev),
   vcov(results_savev))
 
-newabund[i] <- mean(results_savev$coef) * length(results_savev$coef) *
-  catchscale
+newabund[i] <- mean(results_savev$coef) * catchscale
 newse[i] <- sqrt(log(1 + (((seout)/(newabund[[i]]))^2)))
 
 }

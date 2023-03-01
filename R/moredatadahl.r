@@ -160,7 +160,7 @@ LLmatorder <- LLmat[order(LLmat$X2), ]
 
 initparamssave <- results$savestarts[LLmatorder$X1[1:100]]
 
-while (any(is.na(as.numeric(results_savev$OutLogit[, 2]))) == TRUE ||
+while (any(is.na(as.numeric(results_savev$OutLogit[, 2]))) == TRUE &&
   initcount < 10) {
 
 initcount <- initcount + 1
@@ -186,8 +186,7 @@ if (is.numeric(results_savev$OutLogit[2:(kk + 1), 1]) == FALSE ||
   newabund[i] <- NA
   newse[i] <- NA
 } else {
-  newabund[i] <- mean(results_savev$OutLogit[2:(kk + 1), 1]) *
-    length(results_savev$OutLogit[2:(kk + 1), 1]) * catchscale
+  newabund[i] <- mean(results_savev$OutLogit[2:(kk + 1), 1]) * catchscale
   newse[i] <- sqrt(log(1 + (((seout)/(newabund[[i]]))^2)))
 }
 paramsout[[i]] <-  results_savev$OutLogit[2:(kk + 1), 1]

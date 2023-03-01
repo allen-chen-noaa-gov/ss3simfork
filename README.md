@@ -1,6 +1,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ss3simfork
+ss3simfork
+==========
 
 This is a fork of the ss3sim package that incorporates a spatial
 economic model, testing the use of corrected fishery-dependent abundance
@@ -17,20 +18,21 @@ The files added or modified from the original fork should be:
 
 -   /README.Rmd
 -   /inst/extdata/econ
-    -   /inst/extdata/econ/paper_script.r
-    -   /inst/extdata/econ/make_fig5.r
+    -   /inst/extdata/econ/paper\_script.r
+    -   /inst/extdata/econ/make\_fig5.r
     -   …
 -   /R/moredatabias.r
 -   /R/moredatadahl.r
 -   /R/moredatasample.r
--   /R/no_data.r
+-   /R/no\_data.r
 -   /R/readabund.r
--   /R/case_econ.r
--   /R/sample_econ.r
--   /R/spatial_fishery.r
--   /R/ss3sim_base.r (line 478)
+-   /R/case\_econ.r
+-   /R/sample\_econ.r
+-   /R/spatial\_fishery.r
+-   /R/ss3sim\_base.r (line 478)
 
-## Where the economic model interacts with ss3sim
+Where the economic model interacts with ss3sim
+----------------------------------------------
 
 The primary interaction the economic model has with ss3sim is to
 potentially add an additional abundance index to the estimating model.
@@ -42,7 +44,8 @@ depending on some specified sampling pattern, and those samples are used
 to construct an estimate of abundance in that year. This index can then
 be used in the estimating model.
 
-## Running the model
+Running the model
+-----------------
 
 Running the model is largely the same as before. A reproducible script
 is included below. The ggplot2, RColorBrewer, plyr, doParallel, and
@@ -127,7 +130,7 @@ abundscale; NULL
 filename; NULL
 ```
 
-This case file then gets used in the run_ss3sim call.
+This case file then gets used in the run\_ss3sim call.
 
 You should check how many workers your machine can use. With 8 workers
 it took about 2 days.
@@ -169,7 +172,8 @@ and distributes it according to the `betavar` parameters across the
 designated spatial grid. Then, depending on the sampling process
 specified, an index of abundance is estimated.
 
-## Some results
+Some results
+------------
 
 Using the function from the ss3sim package, we can grab aggregated
 results `scalar_dat` and `ts_dat`.
@@ -336,7 +340,8 @@ print(lineout)
 ![Abundance indices output
 example](https://github.com/allen-chen-noaa-gov/ss3simfork/blob/master/inst/extdata/econ/abundline_081821_mortup4.png?raw=true)
 
-## Economists Counting Fish
+Economists Counting Fish
+------------------------
 
 We also include the code to reproduce the results from the paper
 “Economists Counting Fish”. A script can be found in the
@@ -345,5 +350,5 @@ Note this script requires you to set a directory to write the raw output
 into, as the raw output is expected to be a few GB.
 
 Then, the `make_fig5.r` script will reproduce Figure 5 from the paper,
-which outlines the various relative abundance indices and errors. With 8
-workers, it should take about 2 weeks to run.
+which outlines the various relative abundance indices and errors. With
+11 workers, it should take about 5 weeks to run.

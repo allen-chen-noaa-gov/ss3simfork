@@ -346,5 +346,5 @@ directory to write the raw output into, as the raw output is expected to be a
 few GB.
 
 Then, the `make_fig5.r` script will reproduce Figure 5 from the paper, which 
-outlines the various relative abundance indices and errors. With 8 workers, it 
-should take about 2 weeks to run.
+outlines the various relative abundance indices and errors. With 11 workers, it 
+should take about 5 weeks to run.
