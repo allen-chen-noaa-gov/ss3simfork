@@ -297,7 +297,10 @@ ss3sim_base <- function(iterations, scenarios, f_params,
 
       datfile.orig <- change_fltname(datfile.orig)
 
-	  datfile.origsave <- datfile.orig
+	    datfile.origsave <- datfile.orig
+
+      SS_writedat(datlist = datfile.origsave, outfile = pastef(sc, i, "em", "ss3_orig.dat"),
+        overwrite = TRUE, verbose = FALSE)
 
       if (call_change_data) {
         # Start by clearing out the old data. Important so that extra data
