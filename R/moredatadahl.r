@@ -67,11 +67,11 @@ otherdatfin <- spatial_fishery(locnum, obsnum, betavarin, uparams,
   random = FALSE,
   list(...)$avghauls, catchscale, list(...)$catchvarV, list(...)$catchvarN)
 
-polyn <- 2
+polyn <- 3
 polyintnum <- 1
 regconstant <- 0
 polyconstant <- 1
-singlecor <- 1
+singlecor <- 0
 
 otherdatfin$polyn <- polyn
 otherdatfin$polyintnum <- polyintnum
@@ -83,9 +83,13 @@ zifin <- do.call(cbind, otherdatfin$intdat)
 # for not estimating areas far away with few observations
 set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
   table(otherdatfin$choicefin) >= list(...)$minobs])))
-while(all(table(otherdatfin$choicefin) >= list(...)$minobs) == FALSE) {
-set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
+while(all(table(otherdatfin$choicefin) >= list(...)$minobs) == FALSE ||
+  all(table(otherdatfin$startloc) >= list(...)$minobs) == FALSE) {
+choiceset <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
   table(otherdatfin$choicefin) >= list(...)$minobs])))
+startset <- as.numeric(unlist(dimnames(table(otherdatfin$startloc)[
+  table(otherdatfin$startloc) >= list(...)$minobs])))
+set <- intersect(startset, choiceset)
 rowset <- !((!(otherdatfin$choicefin$V1 %in% set)) |
   (!(otherdatfin$startloc %in% set)))
 
@@ -160,7 +164,7 @@ LLmatorder <- LLmat[order(LLmat$X2), ]
 
 initparamssave <- results$savestarts[LLmatorder$X1[1:100]]
 
-while (any(is.na(as.numeric(results_savev$OutLogit[, 2]))) == TRUE &&
+while (any(is.na(as.numeric(results_savev$OutLogit[,2]))) == TRUE &&
   initcount < 10) {
 
 initcount <- initcount + 1
@@ -190,7 +194,7 @@ if (is.numeric(results_savev$OutLogit[2:(kk + 1), 1]) == FALSE ||
   newse[i] <- sqrt(log(1 + (((seout)/(newabund[[i]]))^2)))
 }
 paramsout[[i]] <-  results_savev$OutLogit[2:(kk + 1), 1]
-trueout[[i]] <- t(betavarin)
+trueout[[i]] <- t(betavarin[set])
 choiceout[[i]] <- table(otherdatfin$choicefin)
 startout[[i]] <- table(otherdatfin$startloc)
 }
