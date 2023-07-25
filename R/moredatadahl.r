@@ -50,7 +50,12 @@ for (i in seq_along(scaleabund)) {
 # normalize abundance over locations so only the OM trend affects relative
 # abundance, not spatial size of the fishery, to compare scenarios. Could
 # generalize to let spatial size matter in the future.
+if (length(betavar) == 1) {
+tempb <- runif(betavar, 0.75, 1.50)
+betavarscaled <- (tempb/sum(tempb)) * 10.125
+} else {
 betavarscaled <- (betavar/sum(betavar)) * 10.125
+}
 
 if (list(...)$trend == TRUE) {
 slope <- (max(betavar) - min(betavar))/list(...)$obsyears
@@ -67,11 +72,11 @@ otherdatfin <- spatial_fishery(locnum, obsnum, betavarin, uparams,
   random = FALSE,
   list(...)$avghauls, catchscale, list(...)$catchvarV, list(...)$catchvarN)
 
-polyn <- 3
-polyintnum <- 1
+polyn <- list(...)$polyn
+polyintnum <- list(...)$polyintnum
 regconstant <- 0
 polyconstant <- 1
-singlecor <- 0
+singlecor <- list(...)$singlecor
 
 otherdatfin$polyn <- polyn
 otherdatfin$polyintnum <- polyintnum

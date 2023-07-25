@@ -42,7 +42,12 @@ for (i in seq_along(scaleabund)) {
 # normalize abundance over locations so only the OM trend affects relative
 # abundance, not spatial size of the fishery, to compare scenarios. Could
 # generalize to let spatial size matter in the future.
+if (length(betavar) == 1) {
+betavarscaled <- (runif(betavar, 0.75, 1.50)/
+  sum(runif(betavar, 0.75, 1.50))) * 10.125
+} else {
 betavarscaled <- (betavar/sum(betavar)) * 10.125
+}
 
 if (list(...)$trend == TRUE) {
 slope <- (max(betavar) - min(betavar))/list(...)$obsyears

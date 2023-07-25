@@ -12,3 +12,6 @@ trend; TRUE
 minobs; 20
 catchvarV; 3
 catchvarN; 0
+polyn; 3
+polyintnum; 0
+singlecor; 1

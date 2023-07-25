@@ -39,6 +39,7 @@ lineout <- ggplot(data = plotdata,
 ggsave(lineout, file = paste0(getwd(), "/inst/extdata/econ/fmortup",
   ".png"), width = 16, height = 9)
 
+#this is from iteration one of base scenario
 abundex <- read.csv(paste0(getwd(), "/inst/extdata/econ/abundex.csv"))
 
 abundex <- subset(abundex, abundex$index == 2)

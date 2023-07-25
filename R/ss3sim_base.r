@@ -488,7 +488,8 @@ ss3sim_base <- function(iterations, scenarios, f_params,
       econ_params$filename, obsyears = econ_params$obsyears,
       avghauls = econ_params$avghauls, trend = econ_params$trend,
       minobs = econ_params$minobs, catchvarV = econ_params$catchvarV,
-      catchvarN = econ_params$catchvarN)
+      catchvarN = econ_params$catchvarN, polyn = econ_params$polyn,
+      polyintnum = econ_params$polyintnum, singlecor = econ_params$singlecor)
 
       # Manipulate EM control file to adjust what gets estimated
       # We'll only a portion of the function, the ctl part if
