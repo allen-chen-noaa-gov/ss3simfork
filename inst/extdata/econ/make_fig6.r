@@ -8,18 +8,17 @@ dirsin <- c("mortup_9loc",
   "mortup_8loc_random_20",
   "mortup_8loc_trend_20")
 
+itmax <- 200
+
 linegraphsave <- NULL
 for (i in 1:4) {
 
 # rawoutputdir for files (iterations and scenarios)
 # rawoutputdir <- paste0(# THIS IS THE DIRECTORY YOU CHOSE IN paper_script.r,
 #   dirsin[i])
-
-if (i > 2) {
-  itmax <- 200
-  } else {
-  itmax <- 100
-}
+rawfolder <- "C:\\Users\\Allen.Chen\\SS3SIM_SCRATCH\\make_paper\\"
+rawoutputdir <- paste0(rawfolder,
+  dirsin[i])
 
 abundout <- list()
 for (it in 1:itmax) {
@@ -64,7 +63,7 @@ totabundout <- do.call(rbind, abundout)
 totabundout <- totabundout[totabundout$CPUE > 0, ]
 
 linegraph <- aggregate(totabundout$RelDiff,
-  list(Year = totabundout$year, Index = totabundout$Index), median,
+  list(Year = totabundout$year, Index = totabundout$Index), mean,
   na.rm = TRUE)
 names(linegraph)[names(linegraph) == "x"] <- "RelDiff"
 
@@ -233,6 +232,6 @@ lineout <- ggplot(data = linegraphsave,
   aesthetics = c("colour", "fill"))
 print(lineout)
 
-ggsave(lineout, filename = paste0("C:\\Users\\Allen.Chen\\SS3SIM_SCRATCH\\",
+ggsave(lineout, filename = paste0(rawfolder,
   "abundline_err_facet", ".png"),
   width = 8, height = 8, dpi = 800)

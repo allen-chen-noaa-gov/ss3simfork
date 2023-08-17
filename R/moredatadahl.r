@@ -53,6 +53,7 @@ for (i in seq_along(scaleabund)) {
 if (length(betavar) == 1) {
 tempb <- runif(betavar, 0.75, 1.50)
 betavarscaled <- (tempb/sum(tempb)) * 10.125
+tempb <- runif(betavar, 0.75, 1.50)
 } else {
 betavarscaled <- (betavar/sum(betavar)) * 10.125
 }
@@ -89,7 +90,8 @@ zifin <- do.call(cbind, otherdatfin$intdat)
 set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
   table(otherdatfin$choicefin) >= list(...)$minobs])))
 while(all(table(otherdatfin$choicefin) >= list(...)$minobs) == FALSE ||
-  all(table(otherdatfin$startloc) >= list(...)$minobs) == FALSE) {
+  all(table(otherdatfin$startloc) >= list(...)$minobs) == FALSE ||
+  length(set) < dim(otherdatfin$distance)[2]) {
 choiceset <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
   table(otherdatfin$choicefin) >= list(...)$minobs])))
 startset <- as.numeric(unlist(dimnames(table(otherdatfin$startloc)[
@@ -222,11 +224,13 @@ abundout <- abundout[order(abundout$year), ]
 
 write.table(abundout, file = abundfile, sep = ",", row.names = FALSE,
   quote = FALSE)
-write.table(cbind(do.call(rbind, startout), do.call(rbind, choiceout)),
+write.table(cbind(do.call(rbind, lapply(startout, `[`, 1:length(betavar))), 
+  do.call(rbind, lapply(choiceout, `[`, 1:length(betavar)))),
   file = paste0(getwd(), "/", abundtitle, "/sampout-",
   gsub("/", "-", abundtitle), ".csv"),
   sep = ",", row.names = FALSE, quote = FALSE)
-write.table(cbind(do.call(rbind, trueout), do.call(rbind, paramsout)),
+write.table(cbind(do.call(rbind, lapply(trueout, `[`, 1:length(betavar))), 
+  do.call(rbind, lapply(paramsout, `[`, 1:length(betavar)))),
   file = paste0(getwd(), "/", abundtitle, "/paramsout-",
   gsub("/", "-", abundtitle), ".csv"),
   sep = ",", row.names = FALSE, quote = FALSE)

@@ -43,8 +43,8 @@ for (i in seq_along(scaleabund)) {
 # abundance, not spatial size of the fishery, to compare scenarios. Could
 # generalize to let spatial size matter in the future.
 if (length(betavar) == 1) {
-betavarscaled <- (runif(betavar, 0.75, 1.50)/
-  sum(runif(betavar, 0.75, 1.50))) * 10.125
+tempb <- runif(betavar, 0.75, 1.50)
+betavarscaled <- (tempb/sum(tempb)) * 10.125
 } else {
 betavarscaled <- (betavar/sum(betavar)) * 10.125
 }
@@ -67,12 +67,17 @@ otherdatfin <- spatial_fishery(locnum, obsnum, betavarin, uparams,
 
 # if there are too few observations we cannot estimate locations
 set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
-    table(otherdatfin$choicefin) >= list(...)$minobs])))
-while(all(table(otherdatfin$choicefin) >= list(...)$minobs) == FALSE) {
-set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
-    table(otherdatfin$choicefin) >= list(...)$minobs])))
+  table(otherdatfin$choicefin) >= list(...)$minobs])))
+while(all(table(otherdatfin$choicefin) >= list(...)$minobs) == FALSE ||
+  all(table(otherdatfin$startloc) >= list(...)$minobs) == FALSE ||
+  length(set) < dim(otherdatfin$distance)[2]) {
+choiceset <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
+  table(otherdatfin$choicefin) >= list(...)$minobs])))
+startset <- as.numeric(unlist(dimnames(table(otherdatfin$startloc)[
+  table(otherdatfin$startloc) >= list(...)$minobs])))
+set <- intersect(startset, choiceset)
 rowset <- !((!(otherdatfin$choicefin$V1 %in% set)) |
-    (!(otherdatfin$startloc %in% set)))
+  (!(otherdatfin$startloc %in% set)))
 
 otherdatfin$startloc <- as.matrix(otherdatfin$startloc[rowset, ])
 otherdatfin$choicefin <- data.frame(V1 = otherdatfin$choicefin[rowset, ])
