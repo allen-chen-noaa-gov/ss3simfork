@@ -92,7 +92,7 @@ mapped <- ggplot() +
 
 base <- mapped
 
-otherdatfin <- readRDS(paste0(getwd(),
+load(paste0(getwd(),
   "/inst/extdata/econ/mortup_9loc_singlestart/",
   "otherdatfin_mortup_9loc_singlestart.RData"))
 
