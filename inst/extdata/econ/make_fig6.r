@@ -14,9 +14,7 @@ linegraphsave <- NULL
 for (i in 1:4) {
 
 # rawoutputdir for files (iterations and scenarios)
-# rawoutputdir <- paste0(# THIS IS THE DIRECTORY YOU CHOSE IN paper_script.r,
-#   dirsin[i])
-rawfolder <- "C:\\Users\\Allen.Chen\\SS3SIM_SCRATCH\\make_paper\\"
+rawfolder <- # THIS IS THE DIRECTORY YOU CHOSE IN paper_script.r
 rawoutputdir <- paste0(rawfolder,
   dirsin[i])
 
@@ -108,9 +106,6 @@ lineout <- ggplot(data = linegraph,
   scale_shape_manual(values = c(21, 22, 25, 24)) +
   scale_colour_manual(values = brewer.pal(4, "Set1"))
 
-# ggsave(lineout, file=paste0(nicedir, "\\abundline", ".png"),
-    # width = 16, height = 9)
-
 ###############################################################################
 totabundout <- do.call(rbind, abundout)
 
@@ -196,9 +191,6 @@ lineout <- ggplot(data = linegraph,
   aesthetics = c("colour", "fill"))
 print(lineout)
 
-# ggsave(lineout, filename = paste0(nicedir, "\\abundline_err" ,".png"),
-# width = 3.75, height = 4.21875, dpi=800)
-
 }
 
 lineout <- ggplot(data = linegraphsave,
@@ -232,6 +224,5 @@ lineout <- ggplot(data = linegraphsave,
   aesthetics = c("colour", "fill"))
 print(lineout)
 
-ggsave(lineout, filename = paste0(rawfolder,
-  "abundline_err_facet", ".png"),
+ggsave(lineout, filename = paste0(getwd(), "/inst/extdata/econ/fig6.png"),
   width = 8, height = 8, dpi = 800)
