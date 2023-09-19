@@ -351,4 +351,4 @@ into, as the raw output is expected to be a few GB.
 
 Then, the `make_fig5.r` script will reproduce Figure 5 from the paper,
 which outlines the various relative abundance indices and errors. With
-11 workers, it should take about 5 weeks to run.
+8 workers (Intel i7-8700), it took a little over 16 days.
