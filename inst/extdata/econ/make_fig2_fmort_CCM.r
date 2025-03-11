@@ -138,9 +138,9 @@ png(paste0(getwd(), "/inst/extdata/econ/fig2.png"), width = width2,
 ##     height = 6.5)
 par(mfrow=c(3,1), mar=c(3,3,.5,.5), mgp=c(1.5,.4,0), tck=-.02)
 plot(plotdata$years, plotdata$fvals, type='l', xlab='Year',
-     ylab='Fishing effort (F)', xlim=c(40,100))
+     ylab='Fishing effort (F)', xlim=c(0,100))
 print.letter('(a)', xy)
-plot(abundex$year, abundex$obs, xlim=c(40,100), type='l',
+plot(abundex$year, abundex$obs, xlim=c(0,100), type='l',
      xlab='Year', ylab='Biomass (M t)', ylim=c(0,5))
 print.letter('(b)', xy)
 plot(x, self, type='l', xlab='Length (cm)', ylab='Selectivity', xlim=c(0,100))
