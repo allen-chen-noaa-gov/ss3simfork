@@ -87,6 +87,7 @@ run_ss3model <- function(scenarios, iterations, type = c("om", "em"),
         system(paste0(paste0(bin, " "), ss_em_options, admb_options),
           invisible = TRUE, ignore.stdout = ignore.stdout,
                show.output.on.console = show.output.on.console, ...)
+
         rename_ss3_files(path = "", ss_bin = ss_bin,
           extensions = c("par", "rep", "log", "bar"))
         setwd(wd)
@@ -105,8 +106,12 @@ run_ss3model <- function(scenarios, iterations, type = c("om", "em"),
 #' @author Sean C. Anderson
 rename_ss3_files <- function(path, ss_bin, extensions) {
   for(i in seq_along(extensions)) {
-    file.rename(from = paste0(path, "/", ss_bin, ".", extensions[i]),
-                to   = paste0(path, "/", "ss3",  ".", extensions[i]))
+    browser()
+    from_path <- paste0(path, "/", ss_bin, ".", extensions[i])
+    to_path <- paste0(path, "/", "ss3",  ".", extensions[i])
+    if (file.exists(from_path)) {
+      file.rename(from = from_path, to = to_path)
+    }
   }
 }
 

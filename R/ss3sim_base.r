@@ -213,7 +213,7 @@ ss3sim_base <- function(iterations, scenarios, f_params,
       fake_dat <- c("om/ss3_24o_opt.dat", "om/ss3_24o_safe.dat",
         "em/ss3_24o_opt.dat", "em/ss3_24o_safe.dat")
       sapply(fake_dat, function(fi) write("\n", pastef(pastef(sc, i, fi))))
-	
+
       # If we're bias adjusting, then copy over the .ctl file to the
       # em folder
       if(bias_already_run) {
@@ -291,7 +291,7 @@ ss3sim_base <- function(iterations, scenarios, f_params,
                                         calcomp_params  = calcomp_params,
                                         mlacomp_params  = mlacomp_params,
                                         wtatage_params  = wtatage_params)
-
+browser()
       datfile.orig <- SS_readdat(pastef(sc, i, "om", "ss3.dat"),
                                  verbose = FALSE)
 

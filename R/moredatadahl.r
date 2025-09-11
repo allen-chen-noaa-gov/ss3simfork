@@ -20,6 +20,111 @@ dattemp <- sample_index(dat_list        = datfile.origsave,
   write_file      = FALSE)
 
 realcpue <- (datfile.origsave$CPUE[(100 - list(...)$obsyears):100, ])
+browser()
+
+
+
+
+
+
+start with static fish site preference
+start with static abundance scenario one
+size preference in fisher utility
+
+do not collect length data
+use case length data 
+obviously don't have feedback bc om is fixed
+
+conc <- 2
+prop1 <- c(5,1,1,1)
+prop2 <- c(1,5,1,1)
+prop3 <- c(1,1,5,1)
+prop4 <- c(1,1,1,5)
+(x1 <- rdirichlet(1, alpha = prop1 * conc))
+x2 <- rdirichlet(1, alpha = prop2 * conc)
+x3 <- rdirichlet(1, alpha = prop3 * conc)
+x4 <- rdirichlet(1, alpha = prop4 * conc)
+
+mat <- rbind(x1,x2,x3,x4)
+
+nal <- c(50, 40, 30, 20,0)
+rowSums(mat)
+
+mat[,i] * nal[i]
+mat[,2] * nal[2]
+
+
+
+library(MCMCpack) # for rdirichlet
+
+conc <- 5
+# four areas
+prop1 <- c(5,1,1,1)
+prop2 <- c(1,5,1,1)
+prop3 <- c(1,1,5,1)
+(x1 <- rdirichlet(1, alpha = prop1 * conc))
+x2 <- rdirichlet(1, alpha = prop2 * conc)
+x3 <- rdirichlet(1, alpha = prop3 * conc)
+
+# columns sum to 1 so no biomass lost
+mat <- rbind(x1,x2,x3) |> t()
+mat
+colSums(mat)
+
+# numbers at length for 3 length bins
+nal <- c(50, 40, 5)
+ones <- rep(1,nrow(mat))
+# distribution by length and area
+(X <- mat * ones %*% t(nal))
+# no fish lost
+colSums(X)-nal
+X[,2] - mat[,2]*nal[2]
+
+
+
+
+
+
+
+
+matching_years <- realcpue$year
+reallength <- datfile.origsave$lencomp[datfile.origsave$lencomp$Yr %in%
+  matching_years & datfile.origsave$lencomp$FltSvy == 1, ]
+num_colnames <- grep("^l\\d+$", colnames(reallength), value = TRUE)
+reallength <- reallength[, num_colnames, drop = FALSE]
+num_colnames_numeric <- as.numeric(sub("^l", "", num_colnames))
+
+library(MCMCpack) # for rdirichlet
+
+set.seed(123) # for reproducibility
+
+# Function to generate 9 Dirichlet samples for a single row
+dirichlet_for_row <- function(row, conc = 100) {
+  prop <- row / sum(row)
+  rdirichlet(9, alpha = prop * conc) * 100
+}
+
+# Apply to all rows, store in a list (each element is a 9 x ncol(reallength) matrix)
+dirichlet_list <- lapply(
+  split(reallength, seq(nrow(reallength))),
+  function(x) dirichlet_for_row(as.numeric(x))
+)
+
+x <- as.numeric(sub("^l", "", num_colnames))
+pf <- c(50.8, -3,5.1,15,-999,-999)
+self <- doublenormal(x, pf)
+
+ self*dirichlet_list[[year]][location, ]
+
+
+
+
+
+
+
+
+
+
 
 if (is.null(catchscale) == TRUE) {
   catchscale <- min(datfile.origsave$catch[

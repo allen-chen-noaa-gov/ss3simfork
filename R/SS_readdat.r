@@ -95,13 +95,13 @@ SS_readdat <- function(file, version="3.24", verbose=TRUE,echoall=FALSE,section=
   if((nver>=3.2)&&(nver<3.3)){
     datlist <- SS_readdat_3.24(file=file, verbose=verbose,
                                echoall=echoall, section=section)
-
     # get fleet info
-    finfo<-rbind(datlist$fleetinfo1,c(rep(1,datlist$Nfleet),rep(3,datlist$Nsurveys)))
+    finfo<-datlist$fleetinfo1[,1:(length(datlist$fleetinfo1)-1)] #yac091025
+    finfo<-rbind(finfo,c(rep(1,datlist$Nfleet),rep(3,datlist$Nsurveys)))
     finfo<-rbind(finfo,c(datlist$units_of_catch,rep(0,datlist$Nsurveys)))
     rownames(finfo)[3]<-"type"
     rownames(finfo)[4]<-"units"
-    finfo<-finfo[,1:(length(finfo)-1)]
+    # finfo<-finfo[,1:(length(finfo)-1)] #yac091025
     finfo<-as.data.frame(t(finfo))
     datlist$fleetinfo<-finfo
 
