@@ -7,7 +7,7 @@
 #' @export
 
 spatial_fishery <- function(locnum, obsnum, betavar, uparams, totcatches, year,
-  random = FALSE, avghauls, catchscale, catchvarV, catchvarN) {
+  random = FALSE, avghauls, catchscale, catchvarV, catchvarN, price) {
 
 alpha <- uparams$alpha
 betac <- uparams$betac
@@ -62,7 +62,7 @@ tijk <- betac * distance[j, k] * zi + wijk[k]
 yik[[k]] <- betavar[k, ] * si + bik[k]
 yikT[[k]] <- yik[[k]] + bikN[k]
 
-Vijk[[k]] <- alpha * yik[[k]] + tijk
+Vijk[[k]] <- alpha * price[[k]] * yik[[k]] + tijk
 
 }
 
@@ -72,7 +72,7 @@ choice[[counter]] <- sample(1:kk, 1)
 choice[[counter]] <- which(max(unlist(Vijk)) == Vijk)
 }
 
-yikchosen[[counter]] <- yikT[[choice[[counter]]]]
+yikchosen[[counter]] <- price[[choice[[counter]]]] * yikT[[choice[[counter]]]]
 
 siout[[counter]] <- si
 ziout[[counter]] <- zi

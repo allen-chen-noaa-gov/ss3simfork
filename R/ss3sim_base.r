@@ -291,7 +291,7 @@ ss3sim_base <- function(iterations, scenarios, f_params,
                                         calcomp_params  = calcomp_params,
                                         mlacomp_params  = mlacomp_params,
                                         wtatage_params  = wtatage_params)
-browser()
+
       datfile.orig <- SS_readdat(pastef(sc, i, "om", "ss3.dat"),
                                  verbose = FALSE)
 

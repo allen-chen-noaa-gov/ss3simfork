@@ -106,7 +106,7 @@ run_ss3model <- function(scenarios, iterations, type = c("om", "em"),
 #' @author Sean C. Anderson
 rename_ss3_files <- function(path, ss_bin, extensions) {
   for(i in seq_along(extensions)) {
-    browser()
+
     from_path <- paste0(path, "/", ss_bin, ".", extensions[i])
     to_path <- paste0(path, "/", "ss3",  ".", extensions[i])
     if (file.exists(from_path)) {

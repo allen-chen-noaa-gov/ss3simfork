@@ -12,6 +12,9 @@
 
 moredatadahl <- function(datfile.origsave, dat_list, locnum, obsnum, betavar,
   uparams, abundse = NULL, catchscale = NULL, filename = NULL, ...) {
+
+sizetrue <- 1
+
 dattemp <- sample_index(dat_list        = datfile.origsave,
   outfile         = NULL,
   fleets          = 2,
@@ -20,111 +23,44 @@ dattemp <- sample_index(dat_list        = datfile.origsave,
   write_file      = FALSE)
 
 realcpue <- (datfile.origsave$CPUE[(100 - list(...)$obsyears):100, ])
-browser()
-
-
-
-
-
-
-start with static fish site preference
-start with static abundance scenario one
-size preference in fisher utility
-
-do not collect length data
-use case length data 
-obviously don't have feedback bc om is fixed
-
-conc <- 2
-prop1 <- c(5,1,1,1)
-prop2 <- c(1,5,1,1)
-prop3 <- c(1,1,5,1)
-prop4 <- c(1,1,1,5)
-(x1 <- rdirichlet(1, alpha = prop1 * conc))
-x2 <- rdirichlet(1, alpha = prop2 * conc)
-x3 <- rdirichlet(1, alpha = prop3 * conc)
-x4 <- rdirichlet(1, alpha = prop4 * conc)
-
-mat <- rbind(x1,x2,x3,x4)
-
-nal <- c(50, 40, 30, 20,0)
-rowSums(mat)
-
-mat[,i] * nal[i]
-mat[,2] * nal[2]
-
-
-
-library(MCMCpack) # for rdirichlet
-
-conc <- 5
-# four areas
-prop1 <- c(5,1,1,1)
-prop2 <- c(1,5,1,1)
-prop3 <- c(1,1,5,1)
-(x1 <- rdirichlet(1, alpha = prop1 * conc))
-x2 <- rdirichlet(1, alpha = prop2 * conc)
-x3 <- rdirichlet(1, alpha = prop3 * conc)
-
-# columns sum to 1 so no biomass lost
-mat <- rbind(x1,x2,x3) |> t()
-mat
-colSums(mat)
-
-# numbers at length for 3 length bins
-nal <- c(50, 40, 5)
-ones <- rep(1,nrow(mat))
-# distribution by length and area
-(X <- mat * ones %*% t(nal))
-# no fish lost
-colSums(X)-nal
-X[,2] - mat[,2]*nal[2]
-
-
-
-
-
-
-
 
 matching_years <- realcpue$year
 reallength <- datfile.origsave$lencomp[datfile.origsave$lencomp$Yr %in%
   matching_years & datfile.origsave$lencomp$FltSvy == 1, ]
 num_colnames <- grep("^l\\d+$", colnames(reallength), value = TRUE)
 reallength <- reallength[, num_colnames, drop = FALSE]
-num_colnames_numeric <- as.numeric(sub("^l", "", num_colnames))
+#num_colnames_numeric <- as.numeric(sub("^l", "", num_colnames))
 
-library(MCMCpack) # for rdirichlet
+# start with static fish site preference
+# start with static abundance scenario one
+# size preference in fisher utility
 
-set.seed(123) # for reproducibility
+# do not collect length data
+# use case length data 
+# obviously don't have feedback bc om is fixed
 
-# Function to generate 9 Dirichlet samples for a single row
-dirichlet_for_row <- function(row, conc = 100) {
-  prop <- row / sum(row)
-  rdirichlet(9, alpha = prop * conc) * 100
+conc <- 5
+# four areas, each element (column) corresponds to an area
+# each prop corresponds to one length bin
+# prop1 <- c(5,1,1,1)
+
+proplist <- list()
+dirchlist <- list()
+for (i in 1:dim(reallength)[2]) {
+  v <- rep(1, dim(locnum)[1])
+  pos <- ceiling(i * dim(locnum)[1] / dim(reallength)[2])
+  v[pos] <- 5
+  proplist[[i]] <- v
+  # each x corresponds to the proportion of a length in an area
+  # each prop corresponds to one length bin
+  dirchlist[[i]] <- MCMCpack::rdirichlet(1, alpha = v * conc)
 }
 
-# Apply to all rows, store in a list (each element is a 9 x ncol(reallength) matrix)
-dirichlet_list <- lapply(
-  split(reallength, seq(nrow(reallength))),
-  function(x) dirichlet_for_row(as.numeric(x))
-)
-
-x <- as.numeric(sub("^l", "", num_colnames))
-pf <- c(50.8, -3,5.1,15,-999,-999)
-self <- doublenormal(x, pf)
-
- self*dirichlet_list[[year]][location, ]
-
-
-
-
-
-
-
-
-
-
+# columns sum to 1 so no biomass lost
+mat <- do.call(rbind, dirchlist) |> t()
+# after transpose each row is an area
+# and each column is a length bin
+# colSums(mat)
 
 if (is.null(catchscale) == TRUE) {
   catchscale <- min(datfile.origsave$catch[
@@ -152,6 +88,104 @@ paramsout <- list()
 trueout <- list()
 for (i in seq_along(scaleabund)) {
 
+nal <- as.numeric(reallength[i, ])
+ones <- rep(1, nrow(mat))
+# distribution by length and area
+# X is then the numbers for a length class (column), where each row is an area
+Xlengths <- mat * ones %*% t(nal)
+# no fish lost
+# colSums(X)-nal
+# X[,2] - mat[,2]*nal[2]
+
+Xlengths_norm <- sweep(Xlengths, 1, rowSums(Xlengths), `/`)
+
+############ You need to weight the probability of selecting a location by the
+# mass of fish at that location - uniform does not work
+
+# # For each row in Xlengths_norm, sample a column index using the row's probabilities
+# set.seed(123) # for reproducibility
+# n_samples <- 100000
+# sampled_cols <- integer(n_samples)
+
+# for (j in 1:n_samples) {
+#   # First, sample uniformly from 1 to 9
+#   i <- sample(1:9, 1)
+#   # Then, sample a column index using the probabilities from row i
+#   sampled_cols[j] <- sample(
+#     seq_len(ncol(Xlengths)),
+#     size = 1,
+#     prob = Xlengths_norm[i, ]
+#   )
+# }
+
+# library(doParallel)
+# library(foreach)
+
+# # Register 6 cores for parallel backend
+# cl <- makeCluster(6)
+# registerDoParallel(cl)
+
+# set.seed(123)
+# n_samples <- 100000000
+
+# # Parallel sampling using foreach and doParallel
+# sampled_cols <- foreach(x = 1:n_samples, .combine = c) %dopar% {
+#   i <- sample(1:9, 1)
+#   sample(seq_len(ncol(Xlengths_norm)), size = 1, prob = Xlengths_norm[i, ])
+# }
+
+# stopCluster(cl)
+
+# prop_sampled <- table(sampled_cols) / length(sampled_cols)
+
+#############
+
+# nal_prob <- nal / sum(nal) # Convert nal to probabilities
+
+# # Choose a concentration parameter (higher = less variance, closer to nal_prob)
+# conc <- 100000
+
+# # Generate 9 different Dirichlet vectors, each centered around nal_prob
+# nal_split <- lapply(1:9, function(x) MCMCpack::rdirichlet(1, alpha = nal_prob * conc)[1, ])
+
+# # nal_split <- replicate(9, nal_prob, simplify = FALSE)
+
+# print(Sys.time())
+# # Simulate the sampling process
+# set.seed(123)
+# n_samples <- 100000000
+# sampled_cols <- integer(n_samples)
+
+# for (j in 1:n_samples) {
+#   # Uniformly sample one of the 9 vectors
+#   i <- sample(1:9, 1)
+#   # Sample a column index using the probabilities from the selected vector
+#   sampled_cols[j] <- sample(seq_along(nal_prob), size = 1, prob = nal_split[[i]])
+# }
+
+# # Get the proportions
+# prop_sampled <- table(sampled_cols) / n_samples
+# print(prop_sampled)
+# print(Sys.time())
+
+# Create a linear vector of length 45, first element 0, median element 1
+linear_vec <- seq(0, 2, length.out = 45)
+linear_vec <- linear_vec / linear_vec[23]
+
+weighted_Xlengths <- sweep(Xlengths_norm, 2, linear_vec, `*`)
+
+# For each row of Xlengths_norm, calculate the expected (average) column number
+# this is the average size
+avg_col_num <- apply(Xlengths_norm, 1, function(prob_row) {
+  sum(prob_row * seq_len(ncol(Xlengths_norm)))
+})
+
+avg_price <- rowSums(weighted_Xlengths)
+
+if (sizetrue == 1) {
+  betavar <- rowSums(Xlengths)
+}
+
 # normalize abundance over locations so only the OM trend affects relative
 # abundance, not spatial size of the fishery, to compare scenarios. Could
 # generalize to let spatial size matter in the future.
@@ -176,7 +210,8 @@ betavarin <- as.matrix(betavarscaled) * scaleabund[i]
 otherdatfin <- spatial_fishery(locnum, obsnum, betavarin, uparams,
   datfile.origsave$catch[(100 - list(...)$obsyears):100, ], year = i,
   random = FALSE,
-  list(...)$avghauls, catchscale, list(...)$catchvarV, list(...)$catchvarN)
+  list(...)$avghauls, catchscale, list(...)$catchvarV, list(...)$catchvarN,
+  avg_price)
 
 polyn <- list(...)$polyn
 polyintnum <- list(...)$polyintnum
