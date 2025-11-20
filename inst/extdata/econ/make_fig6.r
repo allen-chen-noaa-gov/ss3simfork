@@ -11,10 +11,10 @@ dirsin <- c("mortup_9loc",
 itmax <- 200
 
 linegraphsave <- NULL
-for (i in 1:4) {
+for (i in 1) {
 
 # rawoutputdir for files (iterations and scenarios)
-rawfolder <- # THIS IS THE DIRECTORY YOU CHOSE IN paper_script.r
+rawfolder <- "C:\\Users\\Allen.Chen\\Desktop\\size_select\\"
 rawoutputdir <- paste0(rawfolder,
   dirsin[i])
 

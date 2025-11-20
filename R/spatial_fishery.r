@@ -72,7 +72,7 @@ choice[[counter]] <- sample(1:kk, 1)
 choice[[counter]] <- which(max(unlist(Vijk)) == Vijk)
 }
 
-yikchosen[[counter]] <- price[[choice[[counter]]]] * yikT[[choice[[counter]]]]
+yikchosen[[counter]] <- yikT[[choice[[counter]]]]
 
 siout[[counter]] <- si
 ziout[[counter]] <- zi
