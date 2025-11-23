@@ -243,6 +243,7 @@ rowset <- !((!(otherdatfin$choicefin$V1 %in% set)) |
 otherdatfin$startloc <- as.matrix(otherdatfin$startloc[rowset, ])
 otherdatfin$choicefin <- data.frame(V1 = otherdatfin$choicefin[rowset, ])
 otherdatfin$catchfin <- data.frame(V1 = otherdatfin$catchfin[rowset, ])
+otherdatfin$pricefin <- data.frame(V1 = otherdatfin$pricefin[rowset, ])
 otherdatfin$distance <- otherdatfin$distance[rowset, ]
 otherdatfin$distance <- otherdatfin$distance[, set]
 otherdatfin$intdat[[1]] <- as.matrix(otherdatfin$intdat[[1]][rowset, ])
@@ -276,6 +277,8 @@ optimOpt <- c(100000, 1.00000000000000e-08, 1, 0)
 methodname <- "BFGS"
 
 bw <- -1
+
+otherdatfin$pricefin <- avg_price
 
 otherdatfin$bw <- bw
 func <- barebones.FishSET::logit_correction_polyint_estscale
