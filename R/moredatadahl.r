@@ -226,6 +226,14 @@ otherdatfin$polyconstant <- polyconstant
 otherdatfin$singlecor <- singlecor
 zifin <- do.call(cbind, otherdatfin$intdat)
 
+profitrowset <- c(otherdatfin$profitfin > 10)
+otherdatfin$startloc <- as.matrix(otherdatfin$startloc[profitrowset, ])
+otherdatfin$choicefin <- data.frame(V1 = otherdatfin$choicefin[profitrowset, ])
+otherdatfin$catchfin <- data.frame(V1 = otherdatfin$catchfin[profitrowset, ])
+otherdatfin$distance <- otherdatfin$distance[profitrowset, ]
+otherdatfin$intdat[[1]] <- as.matrix(otherdatfin$intdat[[1]][profitrowset, ])
+otherdatfin$griddat[[1]] <- otherdatfin$griddat[[1]][profitrowset, ]
+
 # for not estimating areas far away with few observations
 set <- as.numeric(unlist(dimnames(table(otherdatfin$choicefin)[
   table(otherdatfin$choicefin) >= list(...)$minobs])))

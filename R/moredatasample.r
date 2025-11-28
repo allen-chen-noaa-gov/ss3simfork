@@ -135,6 +135,14 @@ otherdatfin <- spatial_fishery(locnum, obsnum, betavarin, uparams,
   list(...)$catchvarN,
   avg_price)
 
+profitrowset <- c(otherdatfin$profitfin > 10)
+otherdatfin$startloc <- as.matrix(otherdatfin$startloc[profitrowset, ])
+otherdatfin$choicefin <- data.frame(V1 = otherdatfin$choicefin[profitrowset, ])
+otherdatfin$catchfin <- data.frame(V1 = otherdatfin$catchfin[profitrowset, ])
+otherdatfin$distance <- otherdatfin$distance[profitrowset, ]
+otherdatfin$intdat[[1]] <- as.matrix(otherdatfin$intdat[[1]][profitrowset, ])
+otherdatfin$griddat[[1]] <- otherdatfin$griddat[[1]][profitrowset, ]
+
 choicefin <- otherdatfin$choicefin
 sifin <- do.call(cbind, otherdatfin$griddat)
 catchfin <- otherdatfin$catchfin

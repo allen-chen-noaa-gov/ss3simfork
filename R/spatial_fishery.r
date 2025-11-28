@@ -26,6 +26,7 @@ if (length(obsnum) == 1) {
 ii <- ii/sum(ii)
 
 yikchosen <- list()
+profitchosen <- list()
 choice <- list()
 siout <- list()
 ziout <- list()
@@ -73,6 +74,7 @@ choice[[counter]] <- which(max(unlist(Vijk)) == Vijk)
 }
 
 yikchosen[[counter]] <- yikT[[choice[[counter]]]]
+profitchosen[[counter]] <- Vijk[[choice[[counter]]]]
 
 siout[[counter]] <- si
 ziout[[counter]] <- zi
@@ -101,12 +103,14 @@ sifin <- matrix(as.numeric(unlist(siout)), length(unlist(siout)),
 catchfin <- data.frame(V1 = unlist(yikchosen))
 choicefin <- data.frame(V1 = unlist(choice))
 
+profitfin <- data.frame(V1 = unlist(profitchosen))
+
 distancefin <- data.frame(do.call(rbind, distanceout))
 colnames(distancefin) <- c("V1", "V2", "V3", "V4")
 
 otherdatfin <- list(griddat = list(as.matrix(sifin)), noCgriddat = NA,
   intdat = list(as.matrix(zifin)), startloc = as.matrix(startlocfin),
-  catchfin = catchfin, choicefin = choicefin)
+  catchfin = catchfin, choicefin = choicefin, profitfin = profitfin)
 otherdatfin$distance <- as.matrix(distancefin)
 
 return(otherdatfin)
