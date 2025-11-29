@@ -169,7 +169,7 @@ Xlengths_norm <- sweep(Xlengths, 1, rowSums(Xlengths), `/`)
 # print(Sys.time())
 
 # Create a linear vector of length 45, first element 0, median element 1
-linear_vec <- seq(0, 2, length.out = 45)
+linear_vec <- seq(0, 10, length.out = 45)
 linear_vec <- linear_vec / linear_vec[23]
 
 weighted_Xlengths <- sweep(Xlengths_norm, 2, linear_vec, `*`)
