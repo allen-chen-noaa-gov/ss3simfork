@@ -7,7 +7,7 @@
 #' @export
 
 spatial_fishery <- function(locnum, obsnum, betavar, uparams, totcatches, year,
-  random = FALSE, avghauls, catchscale, catchvarV, catchvarN, price) {
+  random = FALSE, avghauls, catchscale, catchvarV, catchvarN) {
 
 alpha <- uparams$alpha
 betac <- uparams$betac
@@ -26,7 +26,7 @@ if (length(obsnum) == 1) {
 ii <- ii/sum(ii)
 
 yikchosen <- list()
-pricechosen <- list()
+profitchosen <- list()
 choice <- list()
 siout <- list()
 ziout <- list()
@@ -63,7 +63,7 @@ tijk <- betac * distance[j, k] * zi + wijk[k]
 yik[[k]] <- betavar[k, ] * si + bik[k]
 yikT[[k]] <- yik[[k]] + bikN[k]
 
-Vijk[[k]] <- alpha * price[[k]] * yik[[k]] + tijk
+Vijk[[k]] <- alpha * yik[[k]] + tijk
 
 }
 
@@ -74,8 +74,7 @@ choice[[counter]] <- which(max(unlist(Vijk)) == Vijk)
 }
 
 yikchosen[[counter]] <- yikT[[choice[[counter]]]]
-
-pricechosen[[counter]] <- price[[choice[[counter]]]] 
+profitchosen[[counter]] <- Vijk[[choice[[counter]]]]
 
 siout[[counter]] <- si
 ziout[[counter]] <- zi
@@ -103,14 +102,14 @@ sifin <- matrix(as.numeric(unlist(siout)), length(unlist(siout)),
 
 catchfin <- data.frame(V1 = unlist(yikchosen))
 choicefin <- data.frame(V1 = unlist(choice))
-pricefin <- data.frame(V1 = unlist(pricechosen))
+profitfin <- data.frame(V1 = unlist(profitchosen))
 
 distancefin <- data.frame(do.call(rbind, distanceout))
 colnames(distancefin) <- c("V1", "V2", "V3", "V4")
 
 otherdatfin <- list(griddat = list(as.matrix(sifin)), noCgriddat = NA,
   intdat = list(as.matrix(zifin)), startloc = as.matrix(startlocfin),
-  catchfin = catchfin, choicefin = choicefin, pricefin = pricefin)
+  catchfin = catchfin, choicefin = choicefin, profitfin = profitfin)
 
 otherdatfin$distance <- as.matrix(distancefin)
 
