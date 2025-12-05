@@ -26,6 +26,7 @@ reallength <- datfile.origsave$lencomp[datfile.origsave$lencomp$Yr %in%
 num_colnames <- grep("^l\\d+$", colnames(reallength), value = TRUE)
 reallength <- reallength[, num_colnames, drop = FALSE]
 #num_colnames_numeric <- as.numeric(sub("^l", "", num_colnames))
+lengthvec <- datfile.origsave$lbin_vector
 
 # start with static fish site preference
 # start with static abundance scenario one
@@ -81,17 +82,18 @@ newse <- list()
 for (i in seq_along(scaleabund)) {
 
 nal <- as.numeric(reallength[i, ])
+bal <- (6.8e-6)*lengthvec^3.1*nal
 ones <- rep(1, nrow(mat))
 # distribution by length and area
 # X is then the numbers for a length class (column), where each row is an area
-Xlengths <- mat * ones %*% t(nal)
+Xlengths <- mat * ones %*% t(bal)
 # no fish lost
 # colSums(X)-nal
 # X[,2] - mat[,2]*nal[2]
 
 Xlengths_norm <- sweep(Xlengths, 1, rowSums(Xlengths), `/`)
 
-linear_vec <- seq(0, 2, length.out = 45)
+linear_vec <- seq(0, 6, length.out = 45)
 linear_vec <- linear_vec / linear_vec[23]
 
 weighted_Xlengths <- sweep(Xlengths_norm, 2, linear_vec, `*`)
