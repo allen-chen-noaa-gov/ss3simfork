@@ -30,6 +30,7 @@ reallength <- datfile.origsave$lencomp[datfile.origsave$lencomp$Yr %in%
 num_colnames <- grep("^l\\d+$", colnames(reallength), value = TRUE)
 reallength <- reallength[, num_colnames, drop = FALSE]
 #num_colnames_numeric <- as.numeric(sub("^l", "", num_colnames))
+lengthvec <- datfile.origsave$lbin_vector
 
 # start with static fish site preference
 # start with static abundance scenario one
@@ -88,14 +89,15 @@ paramsout <- list()
 trueout <- list()
 for (i in seq_along(scaleabund)) {
 
-# nal <- as.numeric(reallength[i, ])
-# ones <- rep(1, nrow(mat))
-# # distribution by length and area
-# # X is then the numbers for a length class (column), where each row is an area
-# Xlengths <- mat * ones %*% t(nal)
-# # no fish lost
-# # colSums(X)-nal
-# # X[,2] - mat[,2]*nal[2]
+nal <- as.numeric(reallength[i, ])
+bal <- (6.8e-6)*lengthvec^3.1*nal
+ones <- rep(1, nrow(mat))
+# distribution by length and area
+# X is then the numbers for a length class (column), where each row is an area
+Xlengths <- mat * ones %*% t(bal)
+# no fish lost
+# colSums(X)-nal
+# X[,2] - mat[,2]*nal[2]
 
 # Xlengths_norm <- sweep(Xlengths, 1, rowSums(Xlengths), `/`)
 
@@ -116,6 +118,24 @@ for (i in seq_along(scaleabund)) {
 # if (sizetrue == 1) {
 #   betavar <- rowSums(Xlengths)
 # }
+
+# Create a linear vector of length 45, first element 0, median element 1
+linear_vec <- seq(0, 6, length.out = 45)
+linear_vec <- linear_vec / linear_vec[23]
+
+weighted_Xlengths <- sweep(Xlengths_norm, 2, linear_vec, `*`)
+
+# For each row of Xlengths_norm, calculate the expected (average) column number
+# this is the average size
+avg_col_num <- apply(Xlengths_norm, 1, function(prob_row) {
+  sum(prob_row * seq_len(ncol(Xlengths_norm)))
+})
+
+avg_price <- rowSums(weighted_Xlengths)
+
+if (sizetrue == 1) {
+  betavar <- rowSums(Xlengths)
+}
 
 # normalize abundance over locations so only the OM trend affects relative
 # abundance, not spatial size of the fishery, to compare scenarios. Could
