@@ -12,9 +12,6 @@
 
 moredatadahl <- function(datfile.origsave, dat_list, locnum, obsnum, betavar,
   uparams, abundse = NULL, catchscale = NULL, filename = NULL, ...) {
-
-sizetrue <- 1
-
 dattemp <- sample_index(dat_list        = datfile.origsave,
   outfile         = NULL,
   fleets          = 2,
@@ -23,45 +20,6 @@ dattemp <- sample_index(dat_list        = datfile.origsave,
   write_file      = FALSE)
 
 realcpue <- (datfile.origsave$CPUE[(100 - list(...)$obsyears):100, ])
-
-matching_years <- realcpue$year
-reallength <- datfile.origsave$lencomp[datfile.origsave$lencomp$Yr %in%
-  matching_years & datfile.origsave$lencomp$FltSvy == 1, ]
-num_colnames <- grep("^l\\d+$", colnames(reallength), value = TRUE)
-reallength <- reallength[, num_colnames, drop = FALSE]
-#num_colnames_numeric <- as.numeric(sub("^l", "", num_colnames))
-lengthvec <- datfile.origsave$lbin_vector
-
-# start with static fish site preference
-# start with static abundance scenario one
-# size preference in fisher utility
-
-# do not collect length data
-# use case length data 
-# obviously don't have feedback bc om is fixed
-
-conc <- 5
-# four areas, each element (column) corresponds to an area
-# each prop corresponds to one length bin
-# prop1 <- c(5,1,1,1)
-
-proplist <- list()
-dirchlist <- list()
-for (i in 1:dim(reallength)[2]) {
-  v <- rep(1, dim(locnum)[1])
-  pos <- ceiling(i * dim(locnum)[1] / dim(reallength)[2])
-  v[pos] <- 5
-  proplist[[i]] <- v
-  # each x corresponds to the proportion of a length in an area
-  # each prop corresponds to one length bin
-  dirchlist[[i]] <- MCMCpack::rdirichlet(1, alpha = v * conc)
-}
-
-# columns sum to 1 so no biomass lost
-mat <- do.call(rbind, dirchlist) |> t()
-# after transpose each row is an area
-# and each column is a length bin
-# colSums(mat)
 
 if (is.null(catchscale) == TRUE) {
   catchscale <- min(datfile.origsave$catch[
@@ -89,36 +47,6 @@ paramsout <- list()
 trueout <- list()
 for (i in seq_along(scaleabund)) {
 
-nal <- as.numeric(reallength[i, ])
-bal <- (6.8e-6)*lengthvec^3.1*nal
-ones <- rep(1, nrow(mat))
-# distribution by length and area
-# X is then the numbers for a length class (column), where each row is an area
-Xlengths <- mat * ones %*% t(bal)
-# no fish lost
-# colSums(X)-nal
-# X[,2] - mat[,2]*nal[2]
-
-Xlengths_norm <- sweep(Xlengths, 1, rowSums(Xlengths), `/`)
-
-# Create a linear vector of length 45, first element 0, median element 1
-linear_vec <- seq(0, 6, length.out = 45)
-linear_vec <- linear_vec / linear_vec[23]
-
-weighted_Xlengths <- sweep(Xlengths_norm, 2, linear_vec, `*`)
-
-# For each row of Xlengths_norm, calculate the expected (average) column number
-# this is the average size
-avg_col_num <- apply(Xlengths_norm, 1, function(prob_row) {
-  sum(prob_row * seq_len(ncol(Xlengths_norm)))
-})
-
-avg_price <- rowSums(weighted_Xlengths)
-
-if (sizetrue == 1) {
-  betavar <- rowSums(Xlengths)
-}
-
 # normalize abundance over locations so only the OM trend affects relative
 # abundance, not spatial size of the fishery, to compare scenarios. Could
 # generalize to let spatial size matter in the future.
@@ -143,8 +71,7 @@ betavarin <- as.matrix(betavarscaled) * scaleabund[i]
 otherdatfin <- spatial_fishery(locnum, obsnum, betavarin, uparams,
   datfile.origsave$catch[(100 - list(...)$obsyears):100, ], year = i,
   random = FALSE,
-  list(...)$avghauls, catchscale, list(...)$catchvarV, list(...)$catchvarN,
-  avg_price)
+  list(...)$avghauls, catchscale, list(...)$catchvarV, list(...)$catchvarN)
 
 polyn <- list(...)$polyn
 polyintnum <- list(...)$polyintnum
@@ -176,7 +103,6 @@ rowset <- !((!(otherdatfin$choicefin$V1 %in% set)) |
 otherdatfin$startloc <- as.matrix(otherdatfin$startloc[rowset, ])
 otherdatfin$choicefin <- data.frame(V1 = otherdatfin$choicefin[rowset, ])
 otherdatfin$catchfin <- data.frame(V1 = otherdatfin$catchfin[rowset, ])
-otherdatfin$pricefin <- data.frame(V1 = otherdatfin$pricefin[rowset, ])
 otherdatfin$distance <- otherdatfin$distance[rowset, ]
 otherdatfin$distance <- otherdatfin$distance[, set]
 otherdatfin$intdat[[1]] <- as.matrix(otherdatfin$intdat[[1]][rowset, ])
@@ -210,8 +136,6 @@ optimOpt <- c(100000, 1.00000000000000e-08, 1, 0)
 methodname <- "BFGS"
 
 bw <- -1
-
-otherdatfin$pricefin <- avg_price
 
 otherdatfin$bw <- bw
 func <- barebones.FishSET::logit_correction_polyint_estscale
