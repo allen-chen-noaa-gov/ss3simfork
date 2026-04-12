@@ -27,6 +27,7 @@ ii <- ii/sum(ii)
 
 yikchosen <- list()
 profitchosen <- list()
+profitchosen <- list()
 choice <- list()
 siout <- list()
 ziout <- list()
